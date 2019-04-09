@@ -1,15 +1,15 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Contract\PayInterface;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
 use Wangyingqian\AliChat\Exception\RequestException;
+use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Kernel\Config;
 use Wangyingqian\AliChat\Support\Ali;
 use Wangyingqian\AliChat\Support\Collection;
+use Wangyingqian\AliChat\Support\Http;
 use Wangyingqian\AliChat\Support\Log;
 use Wangyingqian\AliChat\Support\Str;
 
@@ -34,6 +34,13 @@ class Alipay implements AlipayInterface
     ];
 
     /**
+     * 容器
+     *
+     * @var
+     */
+    protected $container;
+
+    /**
      * Alipay payload.
      *
      * @var array
@@ -47,13 +54,11 @@ class Alipay implements AlipayInterface
 
     protected $config;
 
-    /**
-     * Bootstrap.
-     *
-     * @param Config $config
-     */
-    public function __construct(Config $config)
+
+    public function __construct(Config $config, AliChatContainer $container)
     {
+        $this->container = $container;
+
         $this->baseUri = Ali::create($config)->getBaseUri();
         $this->payload = [
             'app_id'         => $config->get('app_id'),
@@ -89,7 +94,7 @@ class Alipay implements AlipayInterface
 
         $this->payload['biz_content'] = json_encode($params);
 
-        $type = $this->getType($type);
+        $type = $this->getType($type.'Pay');
 
         if (class_exists($type)) {
             $app = new $type();
@@ -119,7 +124,7 @@ class Alipay implements AlipayInterface
     public function verify($data = null, $refund = false)
     {
         if (is_null($data)) {
-            $request = Request::createFromGlobals();
+            $request = Http::createFromGlobals();
 
             $data = $request->request->count() > 0 ? $request->request->all() : $request->query->all();
             $data = Ali::encoding($data, 'utf-8', $data['charset'] ?? 'gb2312');
@@ -170,7 +175,7 @@ class Alipay implements AlipayInterface
 
         $this->payload['method'] = $config['method'];
         $this->payload['biz_content'] = $config['biz_content'];
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['sign'] = $this->getSign($this->payload);
 
 
         return Ali::requestApi($this->payload);
@@ -191,7 +196,7 @@ class Alipay implements AlipayInterface
     {
         $this->payload['method'] = 'alipay.trade.refund';
         $this->payload['biz_content'] = json_encode($order);
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['sign'] = $this->getSign($this->payload);
 
         return Ali::requestApi($this->payload);
     }
@@ -211,7 +216,7 @@ class Alipay implements AlipayInterface
     {
         $this->payload['method'] = 'alipay.trade.cancel';
         $this->payload['biz_content'] = json_encode(is_array($order) ? $order : ['out_trade_no' => $order]);
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['sign'] = $this->getSign($this->payload);
 
 
         return Ali::requestApi($this->payload);
@@ -232,7 +237,7 @@ class Alipay implements AlipayInterface
     {
         $this->payload['method'] = 'alipay.trade.close';
         $this->payload['biz_content'] = json_encode(is_array($order) ? $order : ['out_trade_no' => $order]);
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['sign'] = $this->getSign($this->payload);
 
 
         return Ali::requestApi($this->payload);
@@ -253,22 +258,12 @@ class Alipay implements AlipayInterface
     {
         $this->payload['method'] = 'alipay.data.dataservice.bill.downloadurl.query';
         $this->payload['biz_content'] = json_encode(is_array($bill) ? $bill : ['bill_type' => 'trade', 'bill_date' => $bill]);
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['sign'] = $this->getSign($this->payload);
 
 
         $result = Ali::requestApi($this->payload);
 
         return ($result instanceof Collection) ? $result->get('bill_download_url') : '';
-    }
-
-    /**
-     * reply success
-     *
-     * @return Response
-     */
-    public function success()
-    {
-        return Response::create('success');
     }
 
     /**
@@ -282,14 +277,9 @@ class Alipay implements AlipayInterface
      * @throws RequestException
      * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
      */
-    public function voucher(array $params)
+    public function fund(array $params)
     {
-        $type = $this->getType(__FUNCTION__);
-        if (!class_exists($type) || !is_callable([new $type(), __FUNCTION__])) {
-            throw new RequestException("{$type} Done Not Exist Or Done Not Has FIND Method");
-        }
-
-        $config = call_user_func([new $type(), __FUNCTION__], $params);
+        $config = $this->container['alipay.fund']->driver($params);
 
         $this->payload['method'] = $config['method'];
         $this->payload['biz_content'] = $config['biz_content'];
@@ -298,8 +288,22 @@ class Alipay implements AlipayInterface
         return Ali::requestApi($this->payload);
     }
 
+    /**
+     * sign
+     *
+     * @param $payload
+     *
+     * @return string
+     *
+     * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
+     */
+    public function getSign($payload)
+    {
+        return Ali::generateSign($payload);
+    }
+
     protected function getType($type)
     {
-        return get_class($this).'\\'.Str::studly($type);
+        return get_class($this).'\\'.ucfirst($type).'\\'.Str::studly($type);
     }
 }

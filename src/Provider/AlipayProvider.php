@@ -10,9 +10,17 @@ class AlipayProvider implements ServiceProviderInterface
 {
     public function register(Container $container)
     {
-        $container['event'] = function () {
+        $container['alipay'] = function () {
             $aliChat = AliChat::getInstance();
-            return new Alipay($aliChat->getConfig());
+            return new Alipay($aliChat->getConfig(), $aliChat->getContainer());
+        };
+
+        $container['alipay.pay'] = function ($container) {
+            return new Alipay\Pay\Pay($container['alipay']);
+        };
+
+        $container['alipay.fund'] = function ($container) {
+            return new Alipay\Fund\Fund($container['alipay']);
         };
     }
 }

@@ -8,6 +8,9 @@ use Wangyingqian\AliChat\Kernel\Config;
 
 /**
  * @method static Alipay alipay(array $config) 支付宝
+ *
+ * Class AliChat
+ * @package Wangyingqian\AliChat
  */
 class AliChat implements AliChatInterface
 {
@@ -65,30 +68,20 @@ class AliChat implements AliChatInterface
         return self::$instance;
     }
 
-
-    public function __call($name, $config = null)
+    /**
+     * 获取容器
+     *
+     * @return mixed
+     */
+    public function getContainer()
     {
-        new self(reset($config));
-
-        return call_user_func_array([self::class, 'make'], [$name]);
+        return $this->container;
     }
 
     public static function __callStatic($name, $config = null)
     {
         new static(reset($config));
 
-        return call_user_func_array([static::class, 'make'], [$name]);
-    }
-
-    /**
-     * 获取
-     *
-     * @param $name
-     *
-     * @return mixed
-     */
-    protected function make($name)
-    {
         return self::$instance->container[$name];
     }
 

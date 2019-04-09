@@ -2,6 +2,6 @@
 
 require_once 'vendor/autoload.php';
 
+use Wangyingqian\AliChat\AliChat;
 
-
-\Wangyingqian\AliChat\AliChat::fund(['c'=>1]);
+AliChat::alipay(['c'=>1])->fund(['c'=>122]);
