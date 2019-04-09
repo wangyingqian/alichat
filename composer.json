@@ -1,0 +1,40 @@
+{
+  "name": "wangyignqian/alichat",
+  "description": "专注支付宝和微信",
+  "keywords": ["alipay", "wechat"],
+  "license": "MIT",
+  "type": "library",
+  "support": {
+    "issues": "https://github.com/wangyingqian/alichat/issues",
+    "source": "https://github.com/wangyingqian/alichat"
+  },
+  "authors": [
+    {
+      "name": "wangyingqian",
+      "email": "891699279@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "ext-openssl": "*",
+    "ext-simplexml":"*",
+    "monolog/monolog": "^1.24",
+    "symfony/http-foundation": "^3.0|^4.0",
+    "symfony/event-dispatcher": "^3.0|^4.0",
+    "pimple/pimple": "^3.2.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.2",
+    "mockery/mockery": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wangyingqian\\AliChat\\": "./src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Wangyingqian\\AliChat\\Tests\\": "tests"
+    }
+  }
+}
