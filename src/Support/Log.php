@@ -104,7 +104,10 @@ class Log
      */
     public static function createLogger($file = null, $identify = 'temp', $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
     {
-        $file = is_null($file) ? sys_get_temp_dir().'/logs/'.$identify.'.log' : $file;
+
+        $file = is_null($file) ? realpath(__DIR__.'/../../logs/'): $file;
+
+        var_dump($file);
 
         $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
 
