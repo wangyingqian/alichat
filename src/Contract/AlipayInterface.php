@@ -1,7 +1,7 @@
 <?php
 namespace Wangyingqian\AliChat\Contract;
 
-interface FundInterface
+interface AlipayInterface
 {
 
 }

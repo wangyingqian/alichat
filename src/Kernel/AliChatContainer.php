@@ -1,10 +1,9 @@
 <?php
 namespace Wangyingqian\AliChat\Kernel;
 
+use Wangyingqian\AliChat\Application\Alipay;
 use Wangyingqian\AliChat\Provider\EventProvider;
-use Wangyingqian\AliChat\Provider\FundProvider;
 use Wangyingqian\AliChat\Provider\LogProvider;
-use Wangyingqian\AliChat\Provider\PayProvider;
 use Wangyingqian\AliChat\Support\Container;
 
 class AliChatContainer extends Container
@@ -17,8 +16,7 @@ class AliChatContainer extends Container
     protected $providers = [
         EventProvider::class,
         LogProvider::class,
-        PayProvider::class,
-        FundProvider::class
+        Alipay::class
     ];
 
 }

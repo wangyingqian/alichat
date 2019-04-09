@@ -1,10 +1,14 @@
 <?php
 namespace Wangyingqian\AliChat;
 
+use Wangyingqian\AliChat\Application\Alipay;
 use Wangyingqian\AliChat\Contract\AliChatInterface;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Kernel\Config;
 
+/**
+ * @method static Alipay alipay(array $config) 支付宝
+ */
 class AliChat implements AliChatInterface
 {
     /**
@@ -28,6 +32,7 @@ class AliChat implements AliChatInterface
      */
     protected $config;
 
+
     public function __construct($config = [])
     {
         $this->config = new Config($config);
@@ -40,11 +45,21 @@ class AliChat implements AliChatInterface
 
     }
 
+    /**
+     * 获取配置
+     *
+     * @return Config
+     */
     public function getConfig()
     {
         return $this->config;
     }
 
+    /**
+     * 获取实例
+     *
+     * @return AliChat
+     */
     public static function getInstance()
     {
         return self::$instance;
@@ -65,6 +80,13 @@ class AliChat implements AliChatInterface
         return call_user_func_array([static::class, 'make'], [$name]);
     }
 
+    /**
+     * 获取
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
     protected function make($name)
     {
         return self::$instance->container[$name];
