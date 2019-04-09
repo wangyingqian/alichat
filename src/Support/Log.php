@@ -102,10 +102,10 @@ class Log
      *
      * @return \Monolog\Logger
      */
-    public static function createLogger($file = null, $identify = 'temp', $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
+    public static function createLogger($file = null, $identify = 'alichat', $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
     {
 
-        $file = is_null($file) ? realpath(__DIR__.'/../../logs/'): $file;
+        $file = is_null($file) ? './logs/'.$identify.'.php': $file;
 
         var_dump($file);
 
