@@ -9,7 +9,7 @@ class LogProvider implements ServiceProviderInterface
 {
     public function register(Container $container)
     {
-        $container['alichat.log'] = function ($c) {
+        $container['log'] = function ($c) {
             return new Log();
         };
     }

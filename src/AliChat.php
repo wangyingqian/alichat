@@ -8,6 +8,13 @@ use Wangyingqian\AliChat\Kernel\Config;
 class AliChat implements AliChatInterface
 {
     /**
+     * 单例
+     *
+     * @var AliChat
+     */
+    protected static $instance;
+
+    /**
      * 容器
      *
      * @var
@@ -21,15 +28,47 @@ class AliChat implements AliChatInterface
      */
     protected $config;
 
-
     public function __construct($config = [])
     {
         $this->config = new Config($config);
 
-        echo 12;
+        $this->registerContainer();
+
+        if (empty($this->instance)){
+            self::$instance = $this;
+        }
+
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public static function getInstance()
+    {
+        return self::$instance;
     }
 
 
+    public function __call($name, $config = null)
+    {
+        new self(reset($config));
+
+        return call_user_func_array([self::class, 'make'], [$name]);
+    }
+
+    public static function __callStatic($name, $config = null)
+    {
+        new static(reset($config));
+
+        return call_user_func_array([static::class, 'make'], [$name]);
+    }
+
+    protected function make($name)
+    {
+        return self::$instance->container[$name];
+    }
 
     /**
      * 注册容器

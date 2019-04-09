@@ -9,7 +9,7 @@ class EventProvider implements ServiceProviderInterface
 {
     public function register(Container $container)
     {
-        $container['alichat.event'] = function ($c) {
+        $container['event'] = function ($c) {
             return new Event();
         };
     }

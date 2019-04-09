@@ -2,6 +2,6 @@
 
 require_once 'vendor/autoload.php';
 
-$alichat = new \Wangyingqian\AliChat\AliChat();
 
-\Wangyingqian\AliChat\Support\Log::info('xxx');
+
+\Wangyingqian\AliChat\AliChat::pay(['c'=>1]);
