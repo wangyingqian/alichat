@@ -86,7 +86,7 @@ class Alipay implements AlipayInterface
      *
      * @throws RequestException
      */
-    public function pay($type, $params = [])
+    public function pay($method, $params = [])
     {
         $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
         $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
@@ -95,22 +95,45 @@ class Alipay implements AlipayInterface
 
         $this->payload['biz_content'] = json_encode($params);
 
-        $type = $this->getType($type.'Pay');
+        $object = $this->container['alipay.pay']->{$method}($this->payload);
 
-        if (class_exists($type)) {
-            $app = new $type();
-
-            if ($app instanceof PayInterface) {
-                return $app->pay($this->baseUri, array_filter($this->payload, function ($value) {
-                    return $value !== '' && !is_null($value);
-                }));
-            }
-
-            throw new RequestException("Pay type [{$type}] Must Be An Instance Of PayInterface");
+        if (!is_subclass_of($object, App::class)){
+            throw new AliChatException('Object without inheritance');
         }
 
-        throw new RequestException("Pay type [{$type}] not exists");
+        return $object->pay();
     }
+
+    /**
+     * fund
+     *
+     * @param $method
+     * @param array|null $params
+     *
+     * @return Collection
+     *
+     * @throws AliChatException
+     * @throws InvalidSignException
+     * @throws RequestException
+     * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
+     */
+    public function fund($method, array $params = null)
+    {
+        /** @var App $object */
+        $object = $this->container['alipay.fund']->{$method}($params);
+        if (!is_subclass_of($object, App::class)){
+            throw new AliChatException('Object without inheritance');
+        }
+
+        $config = $object->getConfig();
+
+        $this->payload['method'] = $config['method'];
+        $this->payload['biz_content'] = $config['biz_content'];
+        $this->payload['sign'] = Ali::generateSign($this->payload);
+
+        return Ali::requestApi($this->payload);
+    }
+
 
     /**
      * verify sign
@@ -268,37 +291,6 @@ class Alipay implements AlipayInterface
     }
 
     /**
-     * voucher
-     *
-     * @param $method
-     * @param array|null $params
-     *
-     * @return Collection
-     *
-     * @throws AliChatException
-     * @throws InvalidSignException
-     * @throws RequestException
-     * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
-     */
-    public function fund($method, array $params = null)
-    {
-        /** @var App $object */
-        $object = $this->container['alipay.fund']->{$method}($params);
-        if (!is_subclass_of($object, App::class)){
-            throw new AliChatException('Object without inheritance');
-        }
-
-        $config = $object->getConfig();
-
-        $this->payload['method'] = $config['method'];
-        $this->payload['biz_content'] = $config['biz_content'];
-        $this->payload['sign'] = Ali::generateSign($this->payload);
-
-        return Ali::requestApi($this->payload);
-    }
-
-
-    /**
      * sign
      *
      * @param $payload
@@ -314,7 +306,7 @@ class Alipay implements AlipayInterface
 
     protected function getType($type)
     {
-        return get_class($this).'\\'.ucfirst($type).'\\'.Str::studly($type);
+        return get_class($this).'\\'.Str::studly($type);
     }
 
 }

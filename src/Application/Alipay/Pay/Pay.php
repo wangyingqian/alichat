@@ -11,4 +11,9 @@ class Pay
     {
         $this->app = $app;
     }
+
+    public function web($params)
+    {
+        return new Web($params);
+    }
 }
