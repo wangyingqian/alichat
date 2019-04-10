@@ -1,7 +1,7 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-class Base
+class App
 {
     protected $config;
 

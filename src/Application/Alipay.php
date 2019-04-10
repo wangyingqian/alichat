@@ -282,9 +282,9 @@ class Alipay implements AlipayInterface
      */
     public function fund($method, array $params = null)
     {
-        /** @var Base $object */
+        /** @var App $object */
         $object = $this->container['alipay.fund']->{$method}($params);
-        if (!is_subclass_of($object, Base::class)){
+        if (!is_subclass_of($object, App::class)){
             throw new AliChatException('Object without inheritance');
         }
 
