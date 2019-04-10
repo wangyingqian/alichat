@@ -1,6 +1,7 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
+use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Contract\PayInterface;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
@@ -269,7 +270,8 @@ class Alipay implements AlipayInterface
     /**
      * voucher
      *
-     * @param array $params
+     * @param $method
+     * @param array|null $params
      *
      * @return Collection
      *
@@ -277,9 +279,9 @@ class Alipay implements AlipayInterface
      * @throws RequestException
      * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
      */
-    public function fund(array $params)
+    public function fund($method, array $params = null)
     {
-        $config = $this->container['alipay.fund']->driver($params);
+        $config = $this->container['alipay.fund']->{$method}($params);
 
         $this->payload['method'] = $config['method'];
         $this->payload['biz_content'] = $config['biz_content'];
@@ -287,6 +289,7 @@ class Alipay implements AlipayInterface
 
         return Ali::requestApi($this->payload);
     }
+
 
     /**
      * sign
@@ -306,4 +309,5 @@ class Alipay implements AlipayInterface
     {
         return get_class($this).'\\'.ucfirst($type).'\\'.Str::studly($type);
     }
+
 }

@@ -1,9 +1,10 @@
 <?php
 namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 
-class Voucher extends Fund
+class Voucher
 {
-    public function index(){
-        echo 'test';
+    public function __construct($params)
+    {
+        return $params;
     }
 }

@@ -2,8 +2,9 @@
 namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 
 use Wangyingqian\AliChat\Application\Alipay;
+use Wangyingqian\AliChat\Contract\FundInterface;
 
-class Fund
+class Fund implements FundInterface
 {
     protected $app;
 
@@ -12,8 +13,9 @@ class Fund
         $this->app = $app;
     }
 
-    public function driver($params)
+
+    public function voucher($params)
     {
-        var_dump($params);die;
+        return new Voucher($params);
     }
 }
