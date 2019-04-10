@@ -1,10 +1,12 @@
 <?php
 namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 
-class Voucher
+use Wangyingqian\AliChat\Application\Base;
+
+class Voucher extends Base
 {
     public function __construct($params)
     {
-        return $params;
+        $this->config = $params;
     }
 }

@@ -32,12 +32,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Wangyingqian\\AliChat\\": "./src"
+      "Wangyingqian\\AliChat\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Wangyingqian\\AliChat\\Tests\\": "tests"
+      "Wangyingqian\\AliChat\\Tests\\": "tests/"
     }
   }
 }

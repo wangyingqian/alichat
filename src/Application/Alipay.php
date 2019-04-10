@@ -1,9 +1,9 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Contract\PayInterface;
+use Wangyingqian\AliChat\Exception\AliChatException;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
 use Wangyingqian\AliChat\Exception\RequestException;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
@@ -275,13 +275,20 @@ class Alipay implements AlipayInterface
      *
      * @return Collection
      *
+     * @throws AliChatException
      * @throws InvalidSignException
      * @throws RequestException
      * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
      */
     public function fund($method, array $params = null)
     {
-        $config = $this->container['alipay.fund']->{$method}($params);
+        /** @var Base $object */
+        $object = $this->container['alipay.fund']->{$method}($params);
+        if (!is_subclass_of($object, Base::class)){
+            throw new AliChatException('Object without inheritance');
+        }
+
+        $config = $object->getConfig();
 
         $this->payload['method'] = $config['method'];
         $this->payload['biz_content'] = $config['biz_content'];
