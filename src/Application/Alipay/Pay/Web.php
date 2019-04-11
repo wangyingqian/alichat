@@ -39,24 +39,7 @@ class Web extends App
         $payload['sign'] = Ali::generateSign($payload);
 
 
-        return $this->buildPayHtml('https://openapi.alipay.com/gateway.do', $payload, $method);
-    }
-
-    /**
-     * Find.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param $order
-     *
-     * @return array
-     */
-    public function find($order): array
-    {
-        return [
-            'method'      => 'alipay.trade.query',
-            'biz_content' => json_encode(is_array($order) ? $order : ['out_trade_no' => $order]),
-        ];
+        return $this->buildPayHtml('https://openapi.alipaydev.com/gateway.do', $payload, $method);
     }
 
     /**

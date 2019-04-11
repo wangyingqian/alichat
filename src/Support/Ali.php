@@ -2,6 +2,7 @@
 
 namespace Wangyingqian\AliChat\Support;
 
+use function Couchbase\defaultDecoder;
 use Wangyingqian\AliChat\Application\Alipay;
 use Wangyingqian\AliChat\Exception\InvalidConfigException;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
@@ -110,7 +111,7 @@ class Ali
             return ($value == '' || is_null($value)) ? false : true;
         });
 
-        $result = mb_convert_encoding(self::$instance->post('', $data), 'utf-8', 'gb2312');
+        $result = mb_convert_encoding(self::$instance->post('', $data), 'utf-8', 'gbk');
 
         $result = json_decode($result, true);
 
@@ -273,8 +274,9 @@ class Ali
      */
     protected static function processingApiResult($data, $result): Collection
     {
-        $method = str_replace('.', '_', $data['method']).'_response';
 
+        $method = str_replace('.', '_', $data['method']).'_response';
+        var_dump($result);die;
         if (!isset($result['sign']) || $result[$method]['code'] != '10000') {
             throw new RequestException(
                 'Get Alipay API Error:'.$result[$method]['msg'].

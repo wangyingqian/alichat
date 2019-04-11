@@ -61,6 +61,7 @@ class Alipay implements AlipayInterface
         $this->container = $container;
 
         $this->baseUri = Ali::create($config)->getBaseUri();
+
         $this->payload = [
             'app_id'         => $config->get('app_id'),
             'method'         => '',
@@ -70,7 +71,7 @@ class Alipay implements AlipayInterface
             'version'        => '1.0',
             'return_url'     => $config->get('return_url'),
             'notify_url'     => $config->get('notify_url'),
-            'timestamp'      => date('Y-m-d H:i:s'),
+            'timestamp'      => "2019-04-10 09:09:05",
             'sign'           => '',
             'biz_content'    => '',
             'app_auth_token' => $config->get('app_auth_token'),
@@ -120,17 +121,24 @@ class Alipay implements AlipayInterface
     public function fund($method, array $params = null)
     {
         /** @var App $object */
-        $object = $this->container['alipay.fund']->{$method}($params);
-        if (!is_subclass_of($object, App::class)){
-            throw new AliChatException('Object without inheritance');
-        }
+//        $object = $this->container['alipay.fund']->{$method}($params);
+//        if (!is_subclass_of($object, App::class)){
+//            throw new AliChatException('Object without inheritance');
+//        }
+//
+//        $config = $object->getConfig();
+//
+//        $this->payload['method'] = $config['method'];
+//        $this->payload['biz_content'] = $config['biz_content'];
+//        $this->payload['sign'] = Ali::generateSign($this->payload);
 
-        $config = $object->getConfig();
-
-        $this->payload['method'] = $config['method'];
-        $this->payload['biz_content'] = $config['biz_content'];
+        $this->payload['method'] = 'alipay.fund.auth.order.voucher.create';
+//        $biz = [
+//            'out_order_no' => 8077735255938023
+//        ];
+//        $this->payload['biz_content'] = json_encode($biz);
+        var_dump($this->payload);die;
         $this->payload['sign'] = Ali::generateSign($this->payload);
-
         return Ali::requestApi($this->payload);
     }
 
