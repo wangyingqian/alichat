@@ -107,8 +107,6 @@ class Log
 
         $file = is_null($file) ? './logs/'.$identify.'.php': $file;
 
-        var_dump($file);
-
         $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
 
         $handler->setFormatter(

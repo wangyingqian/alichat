@@ -67,7 +67,7 @@ class Alipay implements AlipayInterface
             'method'         => '',
             'format'         => 'JSON',
             'charset'        => 'utf-8',
-            'sign_type'      => 'RSA2',
+            'sign_type'      => 'RSA',
             'version'        => '1.0',
             'return_url'     => $config->get('return_url'),
             'notify_url'     => $config->get('notify_url'),
@@ -76,6 +76,7 @@ class Alipay implements AlipayInterface
             'biz_content'    => '',
             'app_auth_token' => $config->get('app_auth_token'),
         ];
+
     }
 
     /**
@@ -133,12 +134,13 @@ class Alipay implements AlipayInterface
 //        $this->payload['sign'] = Ali::generateSign($this->payload);
 
         $this->payload['method'] = 'alipay.fund.auth.order.voucher.create';
-//        $biz = [
-//            'out_order_no' => 8077735255938023
-//        ];
-//        $this->payload['biz_content'] = json_encode($biz);
-        var_dump($this->payload);die;
+
+        $this->payload['biz_content'] = json_encode($params, 256);
+
         $this->payload['sign'] = Ali::generateSign($this->payload);
+
+
+
         return Ali::requestApi($this->payload);
     }
 

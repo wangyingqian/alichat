@@ -39,7 +39,7 @@ class Web extends App
         $payload['sign'] = Ali::generateSign($payload);
 
 
-        return $this->buildPayHtml('https://openapi.alipaydev.com/gateway.do', $payload, $method);
+        return $this->buildPayHtml('https://openapi.alipay.com/gateway.do', $payload, $method);
     }
 
     /**

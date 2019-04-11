@@ -110,8 +110,9 @@ class Ali
         $data = array_filter($data, function ($value) {
             return ($value == '' || is_null($value)) ? false : true;
         });
-
-        $result = mb_convert_encoding(self::$instance->post('', $data), 'utf-8', 'gbk');
+        $a = http_build_query($data);
+        echo $a;die;
+        $result = mb_convert_encoding(self::$instance->post('', $data), 'utf-8', 'gb2312');
 
         $result = json_decode($result, true);
 
