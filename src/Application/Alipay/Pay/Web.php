@@ -9,21 +9,12 @@ class Web extends App
 {
     public function __construct($params)
     {
-        $this->config = $params;
+        $this->config = array_filter($params, function ($value) {
+            return $value !== '' && !is_null($value);
+        });
     }
 
-    /**
-     * Pay an order.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $endpoint
-     * @param array  $payload
-     *
-     * @throws InvalidConfigException
-     *
-     * @return Response
-     */
+
     public function pay()
     {
         $payload = $this->config;
@@ -38,20 +29,10 @@ class Web extends App
         $payload['biz_content'] = json_encode($biz_array);
         $payload['sign'] = Ali::generateSign($payload);
 
-
         return $this->buildPayHtml('https://openapi.alipay.com/gateway.do', $payload, $method);
     }
 
-    /**
-     * Build Html response.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $endpoint
-     * @param array  $payload
-     * @param string $method
-     *
-     */
+
     protected function buildPayHtml($endpoint, $payload, $method = 'POST')
     {
         if (strtoupper($method) === 'GET') {

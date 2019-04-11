@@ -13,7 +13,6 @@ class Fund implements FundInterface
         $this->app = $app;
     }
 
-
     public function voucher($params)
     {
         return new Voucher($params);

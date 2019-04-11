@@ -67,7 +67,7 @@ class Alipay implements AlipayInterface
             'method'         => '',
             'format'         => 'JSON',
             'charset'        => 'utf-8',
-            'sign_type'      => 'RSA',
+            'sign_type'      => 'RSA2',
             'version'        => '1.0',
             'return_url'     => $config->get('return_url'),
             'notify_url'     => $config->get('notify_url'),
@@ -77,17 +77,10 @@ class Alipay implements AlipayInterface
             'app_auth_token' => $config->get('app_auth_token'),
         ];
 
+        $this->config = $config;
+
     }
 
-    /**
-     * pay
-     *
-     * @param $type
-     * @param array $params
-     * @return mixed
-     *
-     * @throws RequestException
-     */
     public function pay($method, $params = [])
     {
         $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
@@ -106,42 +99,22 @@ class Alipay implements AlipayInterface
         return $object->pay();
     }
 
-    /**
-     * fund
-     *
-     * @param $method
-     * @param array|null $params
-     *
-     * @return Collection
-     *
-     * @throws AliChatException
-     * @throws InvalidSignException
-     * @throws RequestException
-     * @throws \Wangyingqian\AliChat\Exception\InvalidConfigException
-     */
     public function fund($method, array $params = null)
     {
-        /** @var App $object */
-//        $object = $this->container['alipay.fund']->{$method}($params);
-//        if (!is_subclass_of($object, App::class)){
-//            throw new AliChatException('Object without inheritance');
-//        }
-//
-//        $config = $object->getConfig();
-//
-//        $this->payload['method'] = $config['method'];
-//        $this->payload['biz_content'] = $config['biz_content'];
-//        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
+        $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
 
-        $this->payload['method'] = 'alipay.fund.auth.order.voucher.create';
+        unset($params['return_url'], $params['notify_url']);
 
-        $this->payload['biz_content'] = json_encode($params, 256);
+        $this->payload['biz_content'] = json_encode($params);
 
-        $this->payload['sign'] = Ali::generateSign($this->payload);
+        $object = $this->container['alipay.fund']->{$method}($this->payload);
 
+        if (!is_subclass_of($object, App::class)){
+            throw new AliChatException('Object without inheritance');
+        }
 
-
-        return Ali::requestApi($this->payload);
+        return $object->index();
     }
 
 
