@@ -1,13 +1,14 @@
 <?php
+namespace Wangyingqian\AliChat\Kernel;
 
-namespace Wangyingqian\AliChat\Support;
-
-use function Couchbase\defaultDecoder;
-use Wangyingqian\AliChat\Application\Alipay;
 use Wangyingqian\AliChat\Exception\InvalidConfigException;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
 use Wangyingqian\AliChat\Exception\RequestException;
-use Wangyingqian\AliChat\Kernel\Config;
+use Wangyingqian\AliChat\Support\Arr;
+use Wangyingqian\AliChat\Support\Collection;
+use Wangyingqian\AliChat\Support\Http;
+use Wangyingqian\AliChat\Support\Log;
+use Wangyingqian\AliChat\Support\Str;
 use Wangyingqian\AliChat\Support\Traits\HttpRequestTrait;
 
 /**
@@ -19,9 +20,27 @@ use Wangyingqian\AliChat\Support\Traits\HttpRequestTrait;
  * @property string mode current mode
  * @property array log log options
  */
-class Ali
+class AlipayRequest
 {
     use HttpRequestTrait;
+
+    /**
+     * Const mode_normal.
+     */
+    const MODE_NORMAL = 'normal';
+
+    /**
+     * Const mode_dev.
+     */
+    const MODE_DEV = 'dev';
+
+    /**
+     * Const url.
+     */
+    const URL = [
+        self::MODE_NORMAL => 'https://openapi.alipay.com/gateway.do',
+        self::MODE_DEV    => 'https://openapi.alipaydev.com/gateway.do',
+    ];
 
     /**
      * Alipay gateway.
@@ -38,20 +57,13 @@ class Ali
     protected $config;
 
     /**
-     * Instance.
-     *
-     * @var Ali
-     */
-    private static $instance;
-
-    /**
      * Bootstrap.
      *
      * @param Config $config
      */
-    private function __construct(Config $config)
+    public function __construct(Config $config)
     {
-        $this->baseUri = Alipay::URL[$config->get('mode', Alipay::MODE_NORMAL)];
+        $this->baseUri = self::URL[$config->get('mode', self::MODE_NORMAL)];
         $this->config = $config;
 
         $this->setHttpOptions();
@@ -69,54 +81,75 @@ class Ali
         return $this->getConfig($key);
     }
 
-    /**
-     * create.
-     *
-     * @param Config $config
-     *
-     * @return Ali
-     */
-    public static function create(Config $config)
-    {
-        if (php_sapi_name() === 'cli' || !(self::$instance instanceof self)) {
-            self::$instance = new self($config);
-        }
-
-        return self::$instance;
-    }
 
     /**
-     * clear.
-     *
-     * @return void
-     */
-    public function clear()
-    {
-        self::$instance = null;
-    }
-
-    /**
-     * request
+     *  execute request
      *
      * @param array $data
+     *
      * @return Collection
+     *
      * @throws InvalidConfigException
      * @throws InvalidSignException
-     *
      * @throws RequestException
      */
-    public static function requestApi(array $data): Collection
+    public function apiRequest(array $data)
     {
         $data = array_filter($data, function ($value) {
             return ($value == '' || is_null($value)) ? false : true;
         });
 
-        $result = mb_convert_encoding(self::$instance->post('', $data), 'utf-8', 'gb2312');
+        $result = $this->encoding($this->post('', $data),'utf-8', 'gb2312');
 
-        $result = json_decode($result, true);
-
-        return self::processingApiResult($data, $result);
+        return $this->processingApiResult($data, $result);
     }
+
+    /**
+     * page request
+     *
+     * @param $data
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Http
+     */
+    public function pageRequest($data)
+    {
+        $data = array_filter($data, function ($value) {
+            return ($value == '' || is_null($value)) ? false : true;
+        });
+
+        $method = $data['http_method'] ?? 'POST';
+
+        if (strtoupper($method) === 'GET') {
+            return Http::redirect($this->baseUri.'?'.$this->sdkRequest($data));
+        }
+
+        $sHtml = "<form id='alipay_submit' name='alipay_submit' action='".$this->baseUri."' method='.$method.'>";
+        foreach ($data as $key => $val) {
+            $val = str_replace("'", '&apos;', $val);
+            $sHtml .= "<input type='hidden' name='".$key."' value='".$val."'/>";
+        }
+        $sHtml .= "<input type='submit' value='ok' style='display:none;'></form>";
+        $sHtml .= "<script>document.forms['alipay_submit'].submit();</script>";
+
+        return Http::respond($sHtml);
+    }
+
+    /**
+     * sdk Request
+     *
+     * @param $data
+     *
+     * @return string
+     */
+    public function sdkRequest($data)
+    {
+        $data = array_filter($data, function ($value) {
+            return ($value == '' || is_null($value)) ? false : true;
+        });
+
+        return Arr::query($data);
+    }
+
 
     /**
      * Generate sign.
@@ -127,9 +160,9 @@ class Ali
      *
      * @return string
      */
-    public static function generateSign(array $params): string
+    public function generateSign(array $params): string
     {
-        $privateKey = self::$instance->private_key;
+        $privateKey = $this->private_key;
 
         if (is_null($privateKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [private_key]');
@@ -163,9 +196,9 @@ class Ali
      *
      * @return bool
      */
-    public static function verifySign(array $data, $sync = false, $sign = null): bool
+    public function verifySign(array $data, $sync = false, $sign = null): bool
     {
-        $publicKey = self::$instance->ali_public_key;
+        $publicKey = $this->ali_public_key;
 
         if (is_null($publicKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [ali_public_key]');
@@ -182,7 +215,7 @@ class Ali
         $sign = $sign ?? $data['sign'];
 
         $toVerify = $sync ? mb_convert_encoding(json_encode($data, JSON_UNESCAPED_UNICODE), 'gb2312', 'utf-8') :
-            self::getSignContent($data, true);
+            $this->getSignContent($data, true);
 
         return openssl_verify($toVerify, base64_decode($sign), $publicKey, OPENSSL_ALGO_SHA256) === 1;
     }
@@ -195,9 +228,9 @@ class Ali
      *
      * @return string
      */
-    public static function getSignContent(array $data, $verify = false): string
+    public function getSignContent(array $data, $verify = false): string
     {
-        $data = self::encoding($data, $data['charset'] ?? 'gb2312', 'utf-8');
+        $data = $this->encoding($data, $data['charset'] ?? 'gb2312', 'utf-8');
 
         ksort($data);
 
@@ -225,9 +258,9 @@ class Ali
      *
      * @return array
      */
-    public static function encoding($data, $to = 'utf-8', $from = 'gb2312'): array
+    public function encoding($data, $to = 'utf-8', $from = 'gb2312'): array
     {
-        return Arr::encoding((array) $data, $to, $from);
+        return Arr::encoding(Arr::wrap($data), $to, $from);
     }
 
     /**
@@ -272,11 +305,12 @@ class Ali
      *
      * @throws RequestException
      */
-    protected static function processingApiResult($data, $result): Collection
+    protected function processingApiResult($data, $result): Collection
     {
+        var_dump($result);die;
 
         $method = str_replace('.', '_', $data['method']).'_response';
-        var_dump($result);die;
+
         if (!isset($result['sign']) || $result[$method]['code'] != '10000') {
             throw new RequestException(
                 'Get Alipay API Error:'.$result[$method]['msg'].

@@ -1,13 +1,13 @@
 <?php
 namespace Wangyingqian\AliChat;
 
-use Wangyingqian\AliChat\Application\Alipay;
+use Wangyingqian\AliChat\Application\AlipayManage;
 use Wangyingqian\AliChat\Contract\AliChatInterface;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Kernel\Config;
 
 /**
- * @method static Alipay alipay(array $config) 支付宝
+ * @method static AlipayManage alipay(array $config) 支付宝
  *
  * Class AliChat
  * @package Wangyingqian\AliChat
@@ -78,9 +78,9 @@ class AliChat implements AliChatInterface
         return $this->container;
     }
 
-    public static function __callStatic($name, $config = null)
+    public static function __callStatic($name, $config = [])
     {
-        new static(reset($config));
+        new static(empty($config) ? $config : reset($config));
 
         return self::$instance->container[$name];
     }

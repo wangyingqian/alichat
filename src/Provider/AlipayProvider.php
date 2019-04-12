@@ -4,7 +4,8 @@ namespace Wangyingqian\AliChat\Provider;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Wangyingqian\AliChat\AliChat;
-use Wangyingqian\AliChat\Application\Alipay;
+use Wangyingqian\AliChat\Application\AlipayManage;
+use Wangyingqian\AliChat\Kernel\AlipayRequest;
 
 class AlipayProvider implements ServiceProviderInterface
 {
@@ -12,15 +13,11 @@ class AlipayProvider implements ServiceProviderInterface
     {
         $container['alipay'] = function () {
             $aliChat = AliChat::getInstance();
-            return new Alipay($aliChat->getConfig(), $aliChat->getContainer());
+            return new AlipayManage($aliChat->getConfig(), $aliChat->getContainer());
         };
 
-        $container['alipay.pay'] = function ($container) {
-            return new Alipay\Pay\Pay($container['alipay']);
-        };
-
-        $container['alipay.fund'] = function ($container) {
-            return new Alipay\Fund\Fund($container['alipay']);
+        $container['alipay.request'] = function ($container){
+            return new AlipayRequest($container['alipay']->getConfig());
         };
     }
 }
