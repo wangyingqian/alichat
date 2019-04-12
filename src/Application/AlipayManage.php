@@ -115,11 +115,11 @@ class AlipayManage extends Manage implements AlipayInterface
         }
 
         switch ($type){
-            case 'exe':
+            case self::EXECUTE_REQUEST:
                 return $this->container['alipay.request']->apiRequest($payload);
-            case 'page':
+            case self::PAGE_REQUEST:
                 return $this->container['alipay.request']->pageRequest($payload);
-            case 'sdk':
+            case self::SDK_REQUEST:
                 return $this->container['alipay.request']->sdkRequest($payload);
         }
 
