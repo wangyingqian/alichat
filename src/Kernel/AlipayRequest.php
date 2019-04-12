@@ -147,7 +147,7 @@ class AlipayRequest
             return ($value == '' || is_null($value)) ? false : true;
         });
 
-        return Arr::query($data);
+        return htmlspecialchars(Arr::query($data));
     }
 
 

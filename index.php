@@ -40,17 +40,17 @@ class PayController
    public function fund()
    {
        $params = [
-           'auth_no' => '2016101210002001810258115912',
+           'out_order_no' => '2016101210002001810258115912',
            'out_request_no' => '2016101200104001110081001',
-           'remark' => 'xxx',
+           'order_title' => 'xxx',
            'amount' => '23',
 //           'payee_user_id'=>'2088021260830853'
        ];
 
-       $alipay = \Wangyingqian\AliChat\AliChat::alipay($this->config)->fund('unfreeze', $params);
+       $alipay = \Wangyingqian\AliChat\AliChat::alipay($this->config)->fund('freeze', $params);
 
 
-       return $alipay->send();
+       echo  $alipay;
 
    }
 }
