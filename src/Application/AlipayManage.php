@@ -73,40 +73,7 @@ class AlipayManage extends Manage implements AlipayInterface
     }
 
 
-    /**
-     * 验证
-     *
-     * @param null $data
-     * @param bool $refund
-     *
-     * @return Collection
-     *
-     * @throws InvalidSignException
-     */
-    public function verify($data = null, $refund = false)
-    {
-        if (is_null($data)) {
-            $request = Http::createFromGlobals();
-
-            $data = $request->request->count() > 0 ? $request->request->all() : $request->query->all();
-            $data = $this->container['alipay.request']->encoding($data, 'utf-8', $data['charset'] ?? 'gb2312');
-        }
-
-        if (isset($data['fund_bill_list'])) {
-            $data['fund_bill_list'] = htmlspecialchars_decode($data['fund_bill_list']);
-        }
-
-
-        if ($this->container['alipay.request']->verifySign($data)) {
-            return new Collection($data);
-        }
-
-
-        throw new InvalidSignException('Alipay Sign Verify FAILED', $data);
-    }
-
-
-    public function request($payload, $type = 'page')
+    protected function request($payload, $type = 'page')
     {
         $payload['sign'] = $this->getSign($payload);
 
@@ -133,7 +100,7 @@ class AlipayManage extends Manage implements AlipayInterface
      *
      * @return mixed
      */
-    public function getSign($payload)
+    protected function getSign($payload)
     {
         return $this->container['alipay.request']->generateSign($payload);
     }
