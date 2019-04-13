@@ -57,9 +57,9 @@ class AlipayManage extends Manage implements AlipayInterface
      *
      * @throws AliChatException
      */
-    public function fund($method, array $params = null)
+    public function fund($method, $params = [])
     {
-       return $this->run($params,$method, __FUNCTION__);
+       return $this->run($params, $method, __FUNCTION__);
     }
 
     /**
@@ -72,7 +72,7 @@ class AlipayManage extends Manage implements AlipayInterface
      *
      * @throws AliChatException
      */
-    public function common($method, array $params = null)
+    public function common($method, $params = [])
     {
         return $this->run($params,$method, __FUNCTION__);
     }

@@ -2,10 +2,7 @@
 namespace Wangyingqian\AliChat;
 
 use Wangyingqian\AliChat\Application\AlipayManage;
-use Wangyingqian\AliChat\Contract\AliChatInterface;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
-use Wangyingqian\AliChat\Kernel\Config;
-use Wangyingqian\AliChat\Support\Arr;
 
 /**
  * @method static AlipayManage alipay(array $config) 支付宝
@@ -13,7 +10,7 @@ use Wangyingqian\AliChat\Support\Arr;
  * Class AliChat
  * @package Wangyingqian\AliChat
  */
-class AliChat implements AliChatInterface
+class AliChat
 {
     /**
      * 单例
@@ -39,17 +36,6 @@ class AliChat implements AliChatInterface
         if (empty($this->instance)){
             self::$instance = $this;
         }
-
-    }
-
-    /**
-     * 获取容器
-     *
-     * @return mixed
-     */
-    public function getContainer()
-    {
-        return $this->container;
     }
 
     /**
@@ -65,6 +51,16 @@ class AliChat implements AliChatInterface
         new static(empty($config) ? $config : reset($config));
 
         return self::$instance->container[$name];
+    }
+
+    /**
+     * 获取容器
+     *
+     * @return mixed
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**
