@@ -4,12 +4,8 @@ namespace Wangyingqian\AliChat\Application;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Exception\AliChatException;
-use Wangyingqian\AliChat\Exception\InvalidSignException;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Kernel\Config;
-use Wangyingqian\AliChat\Support\Collection;
-use Wangyingqian\AliChat\Support\Http;
-
 
 class AlipayManage extends Manage implements AlipayInterface
 {
@@ -42,7 +38,7 @@ class AlipayManage extends Manage implements AlipayInterface
     }
 
     /**
-     * pay
+     * trade
      *
      * @param $method
      * @param array $params
@@ -51,7 +47,7 @@ class AlipayManage extends Manage implements AlipayInterface
      *
      * @throws AliChatException
      */
-    public function pay($method, $params = [])
+    public function trade($method, $params = [])
     {
         return $this->run($params, $method, __FUNCTION__);
 
@@ -72,7 +68,16 @@ class AlipayManage extends Manage implements AlipayInterface
        return $this->run($params,$method, __FUNCTION__);
     }
 
-
+    /**
+     * request
+     *
+     * @param $payload
+     * @param string $type
+     *
+     * @return bool
+     *
+     * @throws AliChatException
+     */
     protected function request($payload, $type = 'page')
     {
         $payload['sign'] = $this->getSign($payload);

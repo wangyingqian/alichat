@@ -4,13 +4,13 @@ namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 /**
- * 资金授权解冻
+ * 资金授权操作查询
  *
- * Class Unfreeze
+ * Class Query
  *
  * @package Wangyingqian\AliChat\Application\Alipay\Fund
  */
-class Unfreeze extends Alipay
+class Query extends Alipay
 {
-    protected $method = 'alipay.fund.auth.order.unfreeze';
+    protected $method = 'alipay.fund.auth.operation.detail.query';
 }

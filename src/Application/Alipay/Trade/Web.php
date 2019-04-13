@@ -1,5 +1,5 @@
 <?php
-namespace Wangyingqian\AliChat\Application\Alipay\Pay;
+namespace Wangyingqian\AliChat\Application\Alipay\Trade;
 
 use Wangyingqian\AliChat\Application\AlipayManage;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
@@ -11,5 +11,4 @@ class Web extends Alipay
     protected $productCode = 'FAST_INSTANT_TRADE_PAY';
 
     protected $request = AlipayManage::PAGE_REQUEST;
-
 }
