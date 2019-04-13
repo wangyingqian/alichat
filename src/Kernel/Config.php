@@ -5,5 +5,4 @@ use Wangyingqian\AliChat\Support\Collection;
 
 class Config extends Collection
 {
-
 }

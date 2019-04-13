@@ -5,6 +5,7 @@ use Wangyingqian\AliChat\Application\AlipayManage;
 use Wangyingqian\AliChat\Contract\AliChatInterface;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Kernel\Config;
+use Wangyingqian\AliChat\Support\Arr;
 
 /**
  * @method static AlipayManage alipay(array $config) 支付宝
@@ -28,44 +29,17 @@ class AliChat implements AliChatInterface
      */
     protected $container;
 
-    /**
-     * 配置
-     *
-     * @var
-     */
-    protected $config;
-
 
     public function __construct($config = [])
     {
-        $this->config = new Config($config);
-
         $this->registerContainer();
+
+        $this->container['config']->add($config);
 
         if (empty($this->instance)){
             self::$instance = $this;
         }
 
-    }
-
-    /**
-     * 获取配置
-     *
-     * @return Config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * 获取实例
-     *
-     * @return AliChat
-     */
-    public static function getInstance()
-    {
-        return self::$instance;
     }
 
     /**
@@ -78,6 +52,14 @@ class AliChat implements AliChatInterface
         return $this->container;
     }
 
+    /**
+     * call
+     *
+     * @param $name
+     * @param array $config
+     *
+     * @return mixed
+     */
     public static function __callStatic($name, $config = [])
     {
         new static(empty($config) ? $config : reset($config));

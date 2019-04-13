@@ -4,8 +4,6 @@ namespace Wangyingqian\AliChat\Application;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Exception\AliChatException;
-use Wangyingqian\AliChat\Kernel\AliChatContainer;
-use Wangyingqian\AliChat\Kernel\Config;
 
 class AlipayManage extends Manage implements AlipayInterface
 {
@@ -15,25 +13,21 @@ class AlipayManage extends Manage implements AlipayInterface
 
     const PAGE_REQUEST = 'page';
 
-    public function __construct(Config $config, AliChatContainer $container)
+    public function init()
     {
-        $this->container = $container;
-
-        $this->config = $config;
-
         $this->payload = [
-            'app_id'         => $config->get('app_id'),
+            'app_id'         => $this->container['config']->get('app_id'),
             'method'         => '',
             'format'         => 'JSON',
-            'charset'        => $config->get('charset', 'utf-8'),
-            'sign_type'      => $config->get('rsa', 'RSA2'),
+            'charset'        => $this->container['config']->get('charset', 'utf-8'),
+            'sign_type'      => $this->container['config']->get('rsa', 'RSA2'),
             'version'        => '1.0',
-            'return_url'     => $config->get('return_url'),
-            'notify_url'     => $config->get('notify_url'),
+            'return_url'     => $this->container['config']->get('return_url'),
+            'notify_url'     => $this->container['config']->get('notify_url'),
             'timestamp'      => date('Y-m-d H:i:s'),
             'sign'           => '',
             'biz_content'    => '',
-            'app_auth_token' => $config->get('app_auth_token'),
+            'app_auth_token' => $this->container['config']->get('app_auth_token'),
         ];
     }
 
@@ -69,6 +63,21 @@ class AlipayManage extends Manage implements AlipayInterface
     }
 
     /**
+     * common
+     *
+     * @param $method
+     * @param array|null $params
+     *
+     * @return bool
+     *
+     * @throws AliChatException
+     */
+    public function common($method, array $params = null)
+    {
+        return $this->run($params,$method, __FUNCTION__);
+    }
+
+    /**
      * request
      *
      * @param $payload
@@ -99,6 +108,38 @@ class AlipayManage extends Manage implements AlipayInterface
     }
 
     /**
+     * run
+     *
+     * @param $params
+     * @param $method
+     * @param $gateway
+     *
+     * @return bool
+     *
+     * @throws AliChatException
+     */
+    protected function run($params, $method, $gateway)
+    {
+        $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
+        $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
+
+        unset($params['return_url'], $params['notify_url']);
+        $this->payload['biz_content'] = json_encode($params);
+
+        $object = $this->getGateWay($method, $gateway);
+
+        if (!is_subclass_of($object, Alipay::class)){
+            throw new AliChatException('Object without inheritance');
+        }
+
+        $return = $object->getReturn();
+
+        $this->payload['method'] = $return['method'];
+
+        return $this->request($this->payload, $return['request']?:self::EXECUTE_REQUEST);
+    }
+
+    /**
      * sign
      *
      * @param $payload
@@ -108,33 +149,6 @@ class AlipayManage extends Manage implements AlipayInterface
     protected function getSign($payload)
     {
         return $this->container['alipay.request']->generateSign($payload);
-    }
-
-    protected function run($params, $method, $gateway)
-    {
-        $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
-        $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
-
-        unset($params['return_url'], $params['notify_url']);
-
-        $this->payload['biz_content'] = $params;
-
-        $object = $object = $this->getGateWay($method, $gateway);
-
-        if (!is_subclass_of($object, Alipay::class)){
-            throw new AliChatException('Object without inheritance');
-        }
-
-        $return = $object->getReturn();
-
-        if (!empty($return['product_code'])){
-            $params['product_code'] = $return['product_code'];
-        }
-
-        $this->payload['biz_content'] = json_encode($params);
-        $this->payload['method'] = $return['method'];
-
-        return $this->request($this->payload, $return['request']?:self::EXECUTE_REQUEST);
     }
 }
 

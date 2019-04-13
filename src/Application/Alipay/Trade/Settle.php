@@ -4,13 +4,13 @@ namespace Wangyingqian\AliChat\Application\Alipay\Trade;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 /**
- * 退款
+ * 线下结算
  *
- * Class Refund
+ * Class Settle
  *
  * @package Wangyingqian\AliChat\Application\Alipay\Trade
  */
-class Refund extends Alipay
+class Settle extends Alipay
 {
-    protected $method = 'alipay.trade.refund';
+    protected $method = 'alipay.trade.order.settle';
 }

@@ -10,19 +10,18 @@ class Alipay
 
     protected $method;
 
-    protected $productCode;
+    protected $params;
 
     public function __construct(AlipayManage $alipay)
     {
-
     }
 
     public function getReturn()
     {
         return [
-            'request'       => $this->request,
-            'method'        => $this->method,
-            'product_code'  => $this->productCode
+            'request' => $this->request,
+            'method'  => $this->method,
+            'params'  => $this->params
         ];
     }
 }

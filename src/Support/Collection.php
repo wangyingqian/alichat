@@ -195,14 +195,15 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
-     * add the item value.
+     * add
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param array $items
      */
-    public function add($key, $value)
+    public function add($items = [])
     {
-        Arr::set($this->items, $key, $value);
+        foreach ($items as $key => $value) {
+            $this->set($key, $value);
+        }
     }
 
     /**

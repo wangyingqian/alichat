@@ -1,7 +1,8 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-use Wangyingqian\AliChat\Kernel\Config;
+use Wangyingqian\AliChat\Exception\AliChatException;
+use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Support\Str;
 
 class Manage
@@ -20,32 +21,41 @@ class Manage
      */
     protected $payload;
 
-    /**
-     * 配置
-     *
-     * @var
-     */
-    protected $config;
 
-    /**
-     * get config
-     *
-     * @return Config
-     */
-    public function getConfig()
+    public function __construct(AliChatContainer $container)
     {
-        return $this->config;
+        $this->container = $container;
+
+        $this->init();
     }
 
-    public function getPayload()
+    /**
+     * 初始化 子类根据情况复写
+     */
+    public function init()
     {
-        return $this->payload;
     }
 
-    protected function getGateWay($method, $gateway)
+
+    /**
+     * 实例化具体操作对象
+     *
+     * @param $method
+     * @param $gateway
+     *
+     * @return mixed
+     *
+     * @throws AliChatException
+     */
+    public function getGateWay($method, $gateway)
     {
         $class = substr(get_class($this),0, -6).'\\'.Str::studly($gateway .'\\'.$method);
 
+        if (!class_exists($class)){
+            throw new AliChatException("class {$class} is not exist");
+        }
+
         return new $class($this);
     }
+
 }
