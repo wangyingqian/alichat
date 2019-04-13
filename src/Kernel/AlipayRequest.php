@@ -160,7 +160,7 @@ class AlipayRequest
      *
      * @return string
      */
-    public function generateSign(array $params): string
+    public function generateSign(array $params)
     {
         $privateKey = $this->private_key;
 
@@ -196,7 +196,7 @@ class AlipayRequest
      *
      * @return bool
      */
-    public function verifySign(array $data, $sync = false, $sign = null): bool
+    public function verifySign(array $data, $sync = false, $sign = null)
     {
         $publicKey = $this->ali_public_key;
 
@@ -228,7 +228,7 @@ class AlipayRequest
      *
      * @return string
      */
-    public function getSignContent(array $data, $verify = false): string
+    public function getSignContent(array $data, $verify = false)
     {
         $data = $this->encoding($data, $data['charset'] ?? 'gb2312', 'utf-8');
 
@@ -258,7 +258,7 @@ class AlipayRequest
      *
      * @return array
      */
-    public function encoding($data, $to = 'utf-8', $from = 'gb2312'): array
+    public function encoding($data, $to = 'utf-8', $from = 'gb2312')
     {
         return Arr::encoding(Arr::wrap($data), $to, $from);
     }
@@ -305,10 +305,8 @@ class AlipayRequest
      *
      * @throws RequestException
      */
-    protected function processingApiResult($data, $result): Collection
+    protected function processingApiResult($data, $result)
     {
-        var_dump($result);die;
-
         $method = str_replace('.', '_', $data['method']).'_response';
 
         if (!isset($result['sign']) || $result[$method]['code'] != '10000') {
@@ -332,7 +330,7 @@ class AlipayRequest
      *
      * @return self
      */
-    protected function setHttpOptions(): self
+    protected function setHttpOptions()
     {
         if ($this->config->has('http') && is_array($this->config->get('http'))) {
             $this->config->forget('http.base_uri');
