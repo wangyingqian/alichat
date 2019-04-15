@@ -5,7 +5,6 @@ require_once 'vendor/autoload.php';
 
 class PayController
 {
-
     public function trade()
     {
         $order = [
@@ -15,7 +14,6 @@ class PayController
             'product_code' => 'FAST_INSTANT_TRADE_PAY'
         ];
         $alipay = \Wangyingqian\AliChat\Facade\AlipayTrade::web($order);
-//        $alipay = \Wangyingqian\AliChat\AliChat::alipay()->trade('web', $order);
 
         return $alipay->send();
     }
