@@ -11,15 +11,6 @@ use Wangyingqian\AliChat\Support\Log;
 use Wangyingqian\AliChat\Support\Str;
 use Wangyingqian\AliChat\Support\Traits\HttpRequestTrait;
 
-/**
- *
- * @property string app_id alipay app_id
- * @property string ali_public_key
- * @property string private_key
- * @property array http http options
- * @property string mode current mode
- * @property array log log options
- */
 class AlipayRequest
 {
     use HttpRequestTrait;
@@ -63,22 +54,10 @@ class AlipayRequest
      */
     public function __construct(Config $config)
     {
-        $this->baseUri = self::URL[$config->get('mode', self::MODE_NORMAL)];
+        $this->baseUri = self::URL[$config->get('alipay.mode', self::MODE_NORMAL)];
         $this->config = $config;
 
         $this->setHttpOptions();
-    }
-
-    /**
-     * __get.
-     *
-     * @param $key
-     *
-     * @return mixed|null|Config
-     */
-    public function __get($key)
-    {
-        return $this->getConfig($key);
     }
 
 
@@ -162,7 +141,7 @@ class AlipayRequest
      */
     public function generateSign(array $params)
     {
-        $privateKey = $this->private_key;
+        $privateKey = $this->config->get('alipay.private_key');
 
         if (is_null($privateKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [private_key]');
@@ -332,9 +311,9 @@ class AlipayRequest
      */
     protected function setHttpOptions()
     {
-        if ($this->config->has('http') && is_array($this->config->get('http'))) {
-            $this->config->forget('http.base_uri');
-            $this->httpOptions = $this->config->get('http');
+        if ($this->config->has('alipay.http') && is_array($this->config->get('alipay.http'))) {
+            $this->config->forget('alipay.http.base_uri');
+            $this->httpOptions = $this->config->get('alipay.http');
         }
 
         return $this;

@@ -16,18 +16,18 @@ class AlipayManage extends Manage implements AlipayInterface
     public function init()
     {
         $this->payload = [
-            'app_id'         => $this->container['config']->get('app_id'),
+            'app_id'         => $this->container['config']->get('alipay.app_id'),
             'method'         => '',
             'format'         => 'JSON',
-            'charset'        => $this->container['config']->get('charset', 'utf-8'),
-            'sign_type'      => $this->container['config']->get('rsa', 'RSA2'),
+            'charset'        => $this->container['config']->get('alipay.charset', 'utf-8'),
+            'sign_type'      => $this->container['config']->get('alipay.rsa', 'RSA2'),
             'version'        => '1.0',
-            'return_url'     => $this->container['config']->get('return_url'),
-            'notify_url'     => $this->container['config']->get('notify_url'),
+            'return_url'     => $this->container['config']->get('alipay.return_url'),
+            'notify_url'     => $this->container['config']->get('alipay.notify_url'),
             'timestamp'      => date('Y-m-d H:i:s'),
             'sign'           => '',
             'biz_content'    => '',
-            'app_auth_token' => $this->container['config']->get('app_auth_token'),
+            'app_auth_token' => $this->container['config']->get('alipay.app_auth_token'),
         ];
     }
 

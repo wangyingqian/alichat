@@ -5,7 +5,7 @@ use Wangyingqian\AliChat\Application\AlipayManage;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 
 /**
- * @method static AlipayManage alipay(array $config) 支付宝
+ * @method static AlipayManage alipay() 支付宝
  *
  * Class AliChat
  * @package Wangyingqian\AliChat
@@ -27,11 +27,9 @@ class AliChat
     protected $container;
 
 
-    public function __construct($config = [])
+    public function __construct()
     {
         $this->registerContainer();
-
-        $this->container['config']->add($config);
 
         if (empty($this->instance)){
             self::$instance = $this;
@@ -46,9 +44,9 @@ class AliChat
      *
      * @return mixed
      */
-    public static function __callStatic($name, $config = [])
+    public static function __callStatic($name, $config = null)
     {
-        new static(empty($config) ? $config : reset($config));
+        new self();
 
         return self::$instance->container[$name];
     }
