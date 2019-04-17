@@ -5,5 +5,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 class Scan extends Alipay
 {
-    protected $method = 'alipay.trade.precreate';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.precreate';
+    }
 }

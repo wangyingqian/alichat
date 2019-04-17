@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Close extends Alipay
 {
-    protected $method = 'alipay.trade.close';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.close';
+    }
 }

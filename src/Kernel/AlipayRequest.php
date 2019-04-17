@@ -110,7 +110,7 @@ class AlipayRequest
         $sHtml .= "<input type='submit' value='ok' style='display:none;'></form>";
         $sHtml .= "<script>document.forms['alipay_submit'].submit();</script>";
 
-        return Http::respond($sHtml);
+        return Http::respond($sHtml)->send();
     }
 
     /**
@@ -177,7 +177,7 @@ class AlipayRequest
      */
     public function verifySign(array $data, $sync = false, $sign = null)
     {
-        $publicKey = $this->ali_public_key;
+        $publicKey = $this->config->get('alipay.ali_public_key');
 
         if (is_null($publicKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [ali_public_key]');
@@ -287,17 +287,19 @@ class AlipayRequest
     protected function processingApiResult($data, $result)
     {
         $method = str_replace('.', '_', $data['method']).'_response';
+        $result = json_decode(reset($result), true);
 
         if (!isset($result['sign']) || $result[$method]['code'] != '10000') {
             throw new RequestException(
                 'Get Alipay API Error:'.$result[$method]['msg'].
-                (isset($result[$method]['sub_code']) ? (' - '.$result[$method]['sub_code']) : ''),
+                (isset($result[$method]['sub_code']) ? (' - '.$result[$method]['sub_code']) : '').
+                (isset($result[$method]['sub_msg']) ? (' - '.$result[$method]['sub_msg']) : ''),
                 $result
             );
         }
 
         if (self::verifySign($result[$method], true, $result['sign'])) {
-            return new Collection($result[$method]);
+            return $result[$method];
         }
 
 
@@ -311,9 +313,9 @@ class AlipayRequest
      */
     protected function setHttpOptions()
     {
-        if ($this->config->has('alipay.http') && is_array($this->config->get('alipay.http'))) {
-            $this->config->forget('alipay.http.base_uri');
-            $this->httpOptions = $this->config->get('alipay.http');
+        if ($this->config->has('http') && is_array($this->config->get('http'))) {
+            $this->config->forget('http.base_uri');
+            $this->httpOptions = $this->config->get('http');
         }
 
         return $this;

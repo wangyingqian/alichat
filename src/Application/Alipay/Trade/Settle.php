@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Settle extends Alipay
 {
-    protected $method = 'alipay.trade.order.settle';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.order.settle';
+    }
 }

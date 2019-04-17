@@ -4,7 +4,7 @@ namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 /**
- * 资金授权撤销
+ * 资金预授权撤销接
  *
  * Class Cancel
  *
@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Cancel extends Alipay
 {
-    protected $method = 'alipay.fund.auth.operation.cancel';
+    public function __construct()
+    {
+        $this->method = 'alipay.fund.auth.operation.cancel';
+    }
 }

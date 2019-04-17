@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Cancel extends Alipay
 {
-    protected $method = 'alipay.trade.cancel';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.cancel';
+    }
 }

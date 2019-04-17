@@ -4,7 +4,7 @@ namespace Wangyingqian\AliChat\Application\Alipay\Trade;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 /**
- *
+ * pos
  *
  * Class Pos
  *
@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Pos extends Alipay
 {
-    protected $method = 'alipay.trade.pay';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.pay';
+    }
 }

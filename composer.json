@@ -1,13 +1,9 @@
 {
-  "name": "wangyignqian/alichat",
+  "name": "51hs/alichat",
   "description": "专注支付宝和微信",
   "keywords": ["alipay", "wechat"],
   "license": "MIT",
   "type": "library",
-  "support": {
-    "issues": "https://github.com/wangyingqian/alichat/issues",
-    "source": "https://github.com/wangyingqian/alichat"
-  },
   "authors": [
     {
       "name": "wangyingqian",

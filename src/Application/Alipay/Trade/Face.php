@@ -5,5 +5,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 class Face extends Alipay
 {
-    protected $method = 'alipay.trade.create';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.create';
+    }
 }

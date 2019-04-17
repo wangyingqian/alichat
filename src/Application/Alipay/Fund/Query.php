@@ -4,7 +4,7 @@ namespace Wangyingqian\AliChat\Application\Alipay\Fund;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 
 /**
- * 资金授权操作查询
+ * 资金预授权操作查询
  *
  * Class Query
  *
@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Query extends Alipay
 {
-    protected $method = 'alipay.fund.auth.operation.detail.query';
+    public function __construct()
+    {
+        $this->method = 'alipay.fund.auth.operation.detail.query';
+    }
 }

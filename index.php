@@ -8,14 +8,14 @@ class PayController
     public function trade()
     {
         $order = [
-            'out_trade_no' => '1555123497xe232',
+            'out_trade_no' => \Wangyingqian\AliChat\Support\Str::random(12),
             'subject' =>'苹果',
-            'total_amount' => '10.1',
-            'product_code' => 'FAST_INSTANT_TRADE_PAY'
+            'total_amount' => '14.1',
+//            'buyer_id' => '2088102146225135'
         ];
-        $alipay = \Wangyingqian\AliChat\Facade\AlipayTrade::web($order);
+        $alipay = \Wangyingqian\AliChat\Facade\AlipayTrade::scan($order);
 
-        return $alipay->send();
+        return $alipay;
     }
 
    public function fund()
@@ -28,14 +28,32 @@ class PayController
 //           'payee_user_id'=>'2088021260830853'
        ];
 
-       $alipay = \Wangyingqian\AliChat\AliChat::alipay($this->config)->fund('freeze', $params);
+       $alipay = \Wangyingqian\AliChat\Facade\AlipayFund::appFreeze($params);
 
 
-       echo  $alipay;
+       return  $alipay;
+
+   }
+
+   public function common()
+   {
+       $params = [
+           'scopes' => ['auth_user'],
+           'state' => '51hs'
+       ];
+//       $order = [
+//           'bill_type' => 'trade',
+//           'bill_date' => '2019-04-12'
+//       ];
+
+       $re = \Wangyingqian\AliChat\Facade\AlipayCommon::auth($params);
+
+       return $re;
+
 
    }
 }
 
 $alipay = new PayController();
 
-$alipay->trade();
+$alipay->common();

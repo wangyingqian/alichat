@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Unfreeze extends Alipay
 {
-    protected $method = 'alipay.fund.auth.order.unfreeze';
+    public function __construct()
+    {
+        $this->method = 'alipay.fund.auth.order.unfreeze';
+    }
 }

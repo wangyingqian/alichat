@@ -2,10 +2,9 @@
 namespace Wangyingqian\AliChat\Application;
 
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
-use Wangyingqian\AliChat\Contract\AlipayInterface;
 use Wangyingqian\AliChat\Exception\AliChatException;
 
-class AlipayManage extends Manage implements AlipayInterface
+class AlipayManage extends Manage
 {
     const EXECUTE_REQUEST = 'exe';
 
@@ -32,82 +31,6 @@ class AlipayManage extends Manage implements AlipayInterface
     }
 
     /**
-     * trade
-     *
-     * @param $method
-     * @param array $params
-     *
-     * @return mixed
-     *
-     * @throws AliChatException
-     */
-    public function trade($method, $params = [])
-    {
-        return $this->run($params, $method, __FUNCTION__);
-
-    }
-
-    /**
-     * fund
-     *
-     * @param $method
-     * @param array|null $params
-     *
-     * @return mixed
-     *
-     * @throws AliChatException
-     */
-    public function fund($method, $params = [])
-    {
-       return $this->run($params, $method, __FUNCTION__);
-    }
-
-    /**
-     * common
-     *
-     * @param $method
-     * @param array|null $params
-     *
-     * @return bool
-     *
-     * @throws AliChatException
-     */
-    public function common($method, $params = [])
-    {
-        return $this->run($params,$method, __FUNCTION__);
-    }
-
-    /**
-     * request
-     *
-     * @param $payload
-     * @param string $type
-     *
-     * @return bool
-     *
-     * @throws AliChatException
-     */
-    protected function request($payload, $type = 'page')
-    {
-        $payload['sign'] = $this->getSign($payload);
-
-        if (!in_array($type, [self::EXECUTE_REQUEST, self::PAGE_REQUEST, self::SDK_REQUEST])){
-            throw new AliChatException('request tpye error');
-        }
-
-        switch ($type){
-            case self::EXECUTE_REQUEST:
-                return $this->container['alipay.request']->apiRequest($payload);
-            case self::PAGE_REQUEST:
-                return $this->container['alipay.request']->pageRequest($payload);
-            case self::SDK_REQUEST:
-                return $this->container['alipay.request']->sdkRequest($payload);
-        }
-
-        return true;
-    }
-
-    /**
      * run
      *
      * @param $params
@@ -118,7 +41,7 @@ class AlipayManage extends Manage implements AlipayInterface
      *
      * @throws AliChatException
      */
-    protected function run($params, $method, $gateway)
+    public function run($params, $method, $gateway)
     {
         $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
         $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
@@ -137,6 +60,37 @@ class AlipayManage extends Manage implements AlipayInterface
         $this->payload['method'] = $return['method'];
 
         return $this->request($this->payload, $return['request']?:self::EXECUTE_REQUEST);
+    }
+
+
+    /**
+     * request
+     *
+     * @param $payload
+     * @param string $type
+     *
+     * @return bool
+     *
+     * @throws AliChatException
+     */
+    protected function request($payload, $type = self::EXECUTE_REQUEST)
+    {
+        $payload['sign'] = $this->getSign($payload);
+
+        if (!in_array($type, [self::EXECUTE_REQUEST, self::PAGE_REQUEST, self::SDK_REQUEST])){
+            throw new AliChatException('request tpye error');
+        }
+
+        switch ($type){
+            case self::EXECUTE_REQUEST:
+                return $this->container['alipay.request']->apiRequest($payload);
+            case self::PAGE_REQUEST:
+                return $this->container['alipay.request']->pageRequest($payload);
+            case self::SDK_REQUEST:
+                return $this->container['alipay.request']->sdkRequest($payload);
+        }
+
+        return true;
     }
 
     /**

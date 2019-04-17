@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Query extends Alipay
 {
-    protected $method = 'alipay.trade.query';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.query';
+    }
 }

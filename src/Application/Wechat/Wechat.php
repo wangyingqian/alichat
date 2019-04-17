@@ -1,7 +1,7 @@
 <?php
-namespace Wangyingqian\AliChat\Application\Alipay;
+namespace Wangyingqian\AliChat\Application\Wechat;
 
-class Alipay
+class Wechat
 {
     protected $request;
 

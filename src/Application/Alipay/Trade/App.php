@@ -13,7 +13,10 @@ use Wangyingqian\AliChat\Application\AlipayManage;
  */
 class App extends Alipay
 {
-    protected $method = 'alipay.trade.app.pay';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.app.pay';
 
-    protected $request = AlipayManage::SDK_REQUEST;
+        $this->request = AlipayManage::SDK_REQUEST;
+    }
 }

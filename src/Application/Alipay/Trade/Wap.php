@@ -6,7 +6,10 @@ use Wangyingqian\AliChat\Application\AlipayManage;
 
 class Wap extends Alipay
 {
-    protected $method = 'alipay.trade.wap.pay';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.wap.pay';
 
-    protected $request = AlipayManage::PAGE_REQUEST;
+        $this->request = AlipayManage::PAGE_REQUEST;
+    }
 }

@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Refund extends Alipay
 {
-    protected $method = 'alipay.trade.refund';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.refund';
+    }
 }

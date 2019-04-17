@@ -12,5 +12,8 @@ use Wangyingqian\AliChat\Application\Alipay\Alipay;
  */
 class Sync extends Alipay
 {
-    protected $method = 'alipay.trade.orderinfo.sync';
+    public function __construct()
+    {
+        $this->method = 'alipay.trade.orderinfo.sync';
+    }
 }
