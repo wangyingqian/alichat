@@ -1,12 +1,12 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-use Wangyingqian\AliChat\Contract\AlipayInterface;
+use Wangyingqian\AliChat\Contract\AliChatInterface;
 use Wangyingqian\AliChat\Exception\AliChatException;
 use Wangyingqian\AliChat\Kernel\AliChatContainer;
 use Wangyingqian\AliChat\Support\Str;
 
-class Manage implements AlipayInterface
+class Manage implements AliChatInterface
 {
     /**
      * 容器
@@ -59,7 +59,9 @@ class Manage implements AlipayInterface
             throw new AliChatException("class {$class} is not exist");
         }
 
-        return new $class();
+        $object = new $class();
+
+        return $object($this->container);
     }
 
     public function __call($name, $arguments)

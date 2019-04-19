@@ -8,8 +8,8 @@ use Wangyingqian\AliChat\Support\Facade;
 /**
  * Class AlipayCommon
  *
- * @method static Auth auth(array $order)
- * @method static Download download(array $order)
+ * @method static Auth auth(array $order) 用户授权
+ * @method static Download download(array $order) 账单下载
  *
  * @package Wangyingqian\AliChat\Facade
  */

@@ -34,7 +34,7 @@ class Facade
             list($class, $method) = explode('.',$facade);
             return self::$container[$class]->$method($classname, ...$arg);
         }else{
-            return self::$container[$classname];
+            return self::$container[$facade]->$classname(...$arg);
         }
     }
 

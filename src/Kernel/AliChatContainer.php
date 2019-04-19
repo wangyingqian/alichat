@@ -6,6 +6,7 @@ use Wangyingqian\AliChat\Provider\AlipayProvider;
 use Wangyingqian\AliChat\Provider\ConfigProvider;
 use Wangyingqian\AliChat\Provider\EventProvider;
 use Wangyingqian\AliChat\Provider\LogProvider;
+use Wangyingqian\AliChat\Provider\WechatProvider;
 use Wangyingqian\AliChat\Support\Container;
 
 class AliChatContainer extends Container
@@ -21,6 +22,7 @@ class AliChatContainer extends Container
         LogProvider::class,
 
         AlipayProvider::class,
+        WechatProvider::class
     ];
 
 }

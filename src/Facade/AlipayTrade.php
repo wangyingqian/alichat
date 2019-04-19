@@ -19,19 +19,19 @@ use Wangyingqian\AliChat\Support\Facade;
 /**
  * Class Alipay
  *
- * @method static Web web(array $order);
- * @method static Wap wap(array $order)
- * @method static Sync sync(array $order)
- * @method static Settle settle(array $order)
- * @method static Scan scan(array $order)
- * @method static RefundQuery refundQuery(array $order)
- * @method static Refund refund(array $order)
- * @method static Query query(array $order)
- * @method static Pos pos(array $order)
- * @method static Face face(array $order)
- * @method static Close close(array $order)
- * @method static Cancel cancel(array $order)
- * @method static App app(array $order)
+ * @method static Web web(array $order); 网页支付
+ * @method static Wap wap(array $order) 手机h5支付
+ * @method static Sync sync(array $order) 线下订单同步
+ * @method static Settle settle(array $order) 线下结算
+ * @method static Scan scan(array $order) 扫码支付
+ * @method static RefundQuery refundQuery(array $order) 退款查询
+ * @method static Refund refund(array $order) 退款
+ * @method static Query query(array $order) 查询
+ * @method static Pos pos(array $order) 付款码
+ * @method static Face face(array $order) 当面付
+ * @method static Close close(array $order) 关闭交易
+ * @method static Cancel cancel(array $order) 取消交易
+ * @method static App app(array $order) app 支付
  *
  * @package Wangyingqian\AliChat\Facade
  */

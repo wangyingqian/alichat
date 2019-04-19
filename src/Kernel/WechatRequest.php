@@ -66,30 +66,38 @@ class WechatRequest
     public function __construct(Config $config)
     {
         $this->baseUri = self::URL[$config->get('wechat.mode', self::MODE_NORMAL)];
+
         $this->config = $config;
 
-        $this->setDevKey();
-
         $this->setHttpOptions();
+
+        $this->setDevKey();
     }
 
     /**
      * request
      *
      * @param $endpoint
-     * @param $data
+     * @param $payload
      * @param bool $cert
      *
-     * @return Collection
+     * @return array
      *
      * @throws AliChatException
      * @throws InvalidSignException
      */
-    public function requestApi($endpoint, $data, $cert = false)
+    public function requestApi($endpoint, $payload, $cert = false)
     {
+        if ($this->config->get('wechat.mode', self::MODE_NORMAL) ===self::MODE_SERVICE) {
+            $payload = array_merge($payload, [
+                'sub_mch_id' => $this->config->get('wechat.sub_mch_id'),
+                'sub_appid'  => $this->config->get('wechat.sub_app_id', ''),
+            ]);
+        }
+
         $result = $this->post(
             $endpoint,
-            self::toXml($data),
+            self::toXml($payload),
             $cert ? [
                 'cert'    => $this->config->get('wechat.cert_client'),
                 'ssl_key' => $this->config->get('wechat.cert_key'),
@@ -98,39 +106,6 @@ class WechatRequest
         $result = is_array($result) ? $result : $this->fromXml($result);
 
         return $this->processingApiResult($endpoint, $result);
-    }
-
-    /**
-     * filter payload
-     *
-     * @param $payload
-     * @param $params
-     * @param bool $preserve_notify_url
-     *
-     * @return array
-     */
-    public function filterPayload($payload, $params, $preserve_notify_url = false)
-    {
-        $type = $this->getTypeName($params['type'] ?? '');
-
-        $payload = array_merge(
-            $payload,
-            is_array($params) ? $params : ['out_trade_no' => $params]
-        );
-        $payload['appid'] = $this->getConfig($type, '');
-
-        if ($this->getConfig('wechat.mode', self::MODE_NORMAL) === self::MODE_SERVICE) {
-            $payload['sub_appid'] = $this->getConfig('sub_'.$type, '');
-        }
-
-        unset($payload['trade_type'], $payload['type']);
-        if (!$preserve_notify_url) {
-            unset($payload['notify_url']);
-        }
-
-        $payload['sign'] = $this->generateSign($payload);
-
-        return $payload;
     }
 
     /**
@@ -281,10 +256,10 @@ class WechatRequest
      * process result
      *
      * @param $endpoint
-     *
      * @param array $result
      *
-     * @return Collection
+     * @return array
+     *
      * @throws AliChatException
      * @throws InvalidSignException
      */
@@ -307,7 +282,7 @@ class WechatRequest
         if ($endpoint === 'pay/getsignkey' ||
             strpos($endpoint, 'mmpaymkttransfers') !== false ||
             self::generateSign($result) === $result['sign']) {
-            return new Collection($result);
+            return $result;
         }
 
         throw new InvalidSignException('Wechat Sign Verify FAILED', $result);
@@ -316,9 +291,9 @@ class WechatRequest
     /**
      * set dev key
      *
-     * @return $this
+     * @throws AliChatException
      *
-     * @throws \Exception
+     * @throws InvalidSignException
      */
     private function setDevKey()
     {
@@ -327,20 +302,19 @@ class WechatRequest
                 'mch_id'    => $this->config->get('wechat.mch_id'),
                 'nonce_str' => Str::random(),
             ];
+
             $data['sign'] = $this->generateSign($data);
 
             $result = $this->requestApi('pay/getsignkey', $data);
 
             $this->config->set('wechat.key', $result['sandbox_signkey']);
         }
-
-        return $this;
     }
 
     /**
-     * set http options
+     * set http option
      *
-     * @return Support
+     * @return $this
      */
     private function setHttpOptions()
     {

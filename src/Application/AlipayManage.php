@@ -1,8 +1,10 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
+use Symfony\Component\HttpFoundation\Request;
 use Wangyingqian\AliChat\Application\Alipay\Alipay;
 use Wangyingqian\AliChat\Exception\AliChatException;
+use Wangyingqian\AliChat\Exception\InvalidSignException;
 
 class AlipayManage extends Manage
 {
@@ -59,6 +61,8 @@ class AlipayManage extends Manage
 
         $this->payload['method'] = $return['method'];
 
+        $this->payload = array_filter($this->payload);
+
         return $this->request($this->payload, $return['request']?:self::EXECUTE_REQUEST);
     }
 
@@ -93,6 +97,26 @@ class AlipayManage extends Manage
         return true;
     }
 
+    public function verify($data = null, $refund = false)
+    {
+        if (is_null($data)) {
+            $request = Request::createFromGlobals();
+
+            $data = $request->request->count() > 0 ? $request->request->all() : $request->query->all();
+            $data = $this->container['alipay.request']->encoding($data, 'utf-8', $data['charset'] ?? 'gb2312');
+        }
+
+        if (isset($data['fund_bill_list'])) {
+            $data['fund_bill_list'] = htmlspecialchars_decode($data['fund_bill_list']);
+        }
+
+        if ($this->container['alipay.request']->verifySign($data)) {
+            return $data;
+        }
+
+        throw new InvalidSignException('Alipay Sign Verify FAILED', $data);
+    }
+
     /**
      * sign
      *
@@ -104,5 +128,6 @@ class AlipayManage extends Manage
     {
         return $this->container['alipay.request']->generateSign($payload);
     }
+
 }
 

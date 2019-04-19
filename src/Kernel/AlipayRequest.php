@@ -74,10 +74,6 @@ class AlipayRequest
      */
     public function apiRequest(array $data)
     {
-        $data = array_filter($data, function ($value) {
-            return ($value == '' || is_null($value)) ? false : true;
-        });
-
         $result = $this->encoding($this->post('', $data),'utf-8', 'gb2312');
 
         return $this->processingApiResult($data, $result);
@@ -92,10 +88,6 @@ class AlipayRequest
      */
     public function pageRequest($data)
     {
-        $data = array_filter($data, function ($value) {
-            return ($value == '' || is_null($value)) ? false : true;
-        });
-
         $method = $data['http_method'] ?? 'POST';
 
         if (strtoupper($method) === 'GET') {
@@ -122,10 +114,6 @@ class AlipayRequest
      */
     public function sdkRequest($data)
     {
-        $data = array_filter($data, function ($value) {
-            return ($value == '' || is_null($value)) ? false : true;
-        });
-
         return htmlspecialchars(Arr::query($data));
     }
 

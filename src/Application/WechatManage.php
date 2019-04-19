@@ -1,10 +1,8 @@
 <?php
 namespace Wangyingqian\AliChat\Application;
 
-use Symfony\Component\HttpFoundation\Request;
 use Wangyingqian\AliChat\Application\Wechat\Wechat;
 use Wangyingqian\AliChat\Exception\AliChatException;
-use Wangyingqian\AliChat\Kernel\WechatRequest;
 use Wangyingqian\AliChat\Support\Str;
 
 class WechatManage extends Manage
@@ -13,30 +11,15 @@ class WechatManage extends Manage
     public function init()
     {
         $this->payload = [
-            'appid'            => $this->container['config']->get('wechat,app_id', ''),
+            'appid'            => $this->container['config']->get('wechat.app_id', ''),
             'mch_id'           => $this->container['config']->get('wechat.mch_id', ''),
-            'nonce_str'        => Str::random(),
-            'notify_url'       => $this->container['config']->get('wechat.notify_url', ''),
-            'sign'             => '',
-            'trade_type'       => '',
-            'spbill_create_ip' => Request::createFromGlobals()->getClientIp(),
+            'nonce_str'        =>Str::random()
         ];
-
-        if ($this->container['config']->get('wechat.mode', WechatRequest::MODE_NORMAL) === WechatRequest::MODE_SERVICE) {
-            $this->payload = array_merge($this->payload, [
-                'sub_mch_id' => $this->container['config']->get('sub_mch_id'),
-                'sub_appid'  => $this->container['config']->get('sub_app_id', ''),
-            ]);
-        }
     }
 
     public function run($params, $method, $gateway)
     {
-        $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
-        $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
-
-        unset($params['return_url'], $params['notify_url']);
-        $this->payload['biz_content'] = json_encode($params);
+        $this->payload += $params;
 
         $object = $this->getGateWay($method, $gateway);
 
@@ -46,9 +29,17 @@ class WechatManage extends Manage
 
         $return = $object->getReturn();
 
-        $this->payload['method'] = $return['method'];
+        $this->payload['trade_type'] = $return['trade_type'];
 
-        return $this->container['wechat.request']->requestApi($this->payload);
+        foreach ($return['params'] ?? [] as $k =>$v){
+            $this->payload[$k] = $v;
+        }
+
+        $this->payload = array_filter($this->payload);
+
+        $this->payload['sign'] = $this->container['wechat.request']->generateSign($this->payload);
+
+        return $this->container['wechat.request']->requestApi($return['method'], $this->payload);
     }
 
 }

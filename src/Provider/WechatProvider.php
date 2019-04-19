@@ -6,7 +6,6 @@ use Pimple\ServiceProviderInterface;
 use Wangyingqian\AliChat\Application\WechatManage;
 use Wangyingqian\AliChat\Kernel\WechatRequest;
 
-
 class WechatProvider implements ServiceProviderInterface
 {
     public function register(Container $container)

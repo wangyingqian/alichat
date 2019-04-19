@@ -1,7 +1,7 @@
 <?php
 namespace Wangyingqian\AliChat\Contract;
 
-interface AlipayInterface
+interface AliChatInterface
 {
     public function run($params, $method, $gateway);
 }
