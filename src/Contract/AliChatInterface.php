@@ -3,5 +3,5 @@ namespace Wangyingqian\AliChat\Contract;
 
 interface AliChatInterface
 {
-    public function run($params, $method, $gateway);
+    public function run($gateway,$method);
 }

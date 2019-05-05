@@ -18,5 +18,9 @@ class AppFreeze extends Alipay
         $this->method = 'alipay.fund.auth.order.app.freeze';
 
         $this->request = AlipayManage::SDK_REQUEST;
+
+        $this->params = [
+            'product_code'=>'PRE_AUTH_ONLINE'
+        ];
     }
 }

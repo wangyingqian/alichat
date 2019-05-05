@@ -11,9 +11,9 @@ use Wangyingqian\AliChat\Support\Facade;
 /**
  * Class AlipayFund
  *
- * @method static AppFreeze appFreeze(array $order) 线上冻结资金
+ * @method static AppFreeze app_freeze(array $order) 线上冻结资金
  * @method static Cancel cancel(array $order) 资金授权撤销
- * @method static PosFreeze posFreeze(array $order) 扫码冻结资金
+ * @method static PosFreeze pos_freeze(array $order) 扫码冻结资金
  * @method static Query query(array $order) 资金授权操作查询
  * @method static Unfreeze unfreeze(array $order) 解冻资金
  *

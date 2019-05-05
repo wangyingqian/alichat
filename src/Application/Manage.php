@@ -36,7 +36,7 @@ class Manage implements AliChatInterface
     {
     }
 
-    public function run($params, $method, $gateway)
+    public function run($gateway, $method)
     {
         return null;
     }
@@ -53,7 +53,7 @@ class Manage implements AliChatInterface
      */
     public function getGateWay($method, $gateway)
     {
-        $class = substr(get_class($this),0, -6).'\\'.Str::studly($gateway .'\\'.$method);
+        $class = substr(get_class($this),0, -6).'\\'.Str::ucfirst($gateway). '\\'.Str::ucfirst(Str::studly($method));
 
         if (!class_exists($class)){
             throw new AliChatException("class {$class} is not exist");
@@ -64,11 +64,9 @@ class Manage implements AliChatInterface
         return $object($this->container);
     }
 
-    public function __call($name, $arguments)
+    public function __call($name, $method)
     {
-        list($method, $args) = $arguments;
-
-        return $this->run($args, $method, $name);
+        return $this->run($name, ...$method);
     }
 
 }

@@ -11,15 +11,15 @@ class WechatManage extends Manage
     public function init()
     {
         $this->payload = [
-            'appid'            => $this->container['config']->get('wechat.app_id', ''),
-            'mch_id'           => $this->container['config']->get('wechat.mch_id', ''),
+            'appid'            => '',
+            'mch_id'           => '',
             'nonce_str'        =>Str::random()
         ];
     }
 
-    public function run($params, $method, $gateway)
+    public function run($gateway, $method)
     {
-        $this->payload += $params;
+        $this->parseParams();
 
         $object = $this->getGateWay($method, $gateway);
 
@@ -40,6 +40,31 @@ class WechatManage extends Manage
         $this->payload['sign'] = $this->container['wechat.request']->generateSign($this->payload);
 
         return $this->container['wechat.request']->requestApi($return['method'], $this->payload);
+    }
+
+
+    /**
+     * 过滤参数
+     */
+    protected function parseParams()
+    {
+        $params = $this->container['config']->all();
+
+        $ignoreParams = [
+            'http',
+            'log',
+            'cert_client',
+            'cert_key',
+            'mode',
+            'key'
+        ];
+
+        foreach ($params as $k =>$v){
+
+            if (in_array($k, $ignoreParams)) continue;
+
+            $this->payload[$k] = $v;
+        }
     }
 
 }

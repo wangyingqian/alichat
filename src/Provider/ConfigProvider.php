@@ -9,7 +9,7 @@ class ConfigProvider implements ServiceProviderInterface
 {
     public function register(Container $container)
     {
-        $container['config'] = function () {
+        $container['config'] = function ($c) {
             return new Config();
         };
     }

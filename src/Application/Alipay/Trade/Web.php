@@ -18,5 +18,9 @@ class Web extends Alipay
         $this->method = 'alipay.trade.page.pay';
 
         $this->request = AlipayManage::PAGE_REQUEST;
+
+        $this->params = [
+            'product_code' => 'FAST_INSTANT_TRADE_PAY'
+        ];
     }
 }

@@ -17,41 +17,34 @@ class AlipayManage extends Manage
     public function init()
     {
         $this->payload = [
-            'app_id'         => $this->container['config']->get('alipay.app_id'),
+            'app_id'         => '',
             'method'         => '',
             'format'         => 'JSON',
-            'charset'        => $this->container['config']->get('alipay.charset', 'utf-8'),
-            'sign_type'      => $this->container['config']->get('alipay.rsa', 'RSA2'),
+            'charset'        => 'utf-8',
+            'sign_type'      => 'RSA2',
             'version'        => '1.0',
-            'return_url'     => $this->container['config']->get('alipay.return_url'),
-            'notify_url'     => $this->container['config']->get('alipay.notify_url'),
             'timestamp'      => date('Y-m-d H:i:s'),
             'sign'           => '',
             'biz_content'    => '',
-            'app_auth_token' => $this->container['config']->get('alipay.app_auth_token'),
+            'app_auth_token' => '',
         ];
     }
 
     /**
      * run
      *
-     * @param $params
+     * @param $name
      * @param $method
-     * @param $gateway
      *
-     * @return bool
+     * @return bool|null
      *
      * @throws AliChatException
      */
-    public function run($params, $method, $gateway)
+    public function run($name, $method)
     {
-        $this->payload['return_url'] = $params['return_url'] ?? $this->payload['return_url'];
-        $this->payload['notify_url'] = $params['notify_url'] ?? $this->payload['notify_url'];
+        $this->parseParams();
 
-        unset($params['return_url'], $params['notify_url']);
-        $this->payload['biz_content'] = json_encode($params);
-
-        $object = $this->getGateWay($method, $gateway);
+        $object = $this->getGateWay($method, $name);
 
         if (!is_subclass_of($object, Alipay::class)){
             throw new AliChatException('Object without inheritance');
@@ -60,8 +53,10 @@ class AlipayManage extends Manage
         $return = $object->getReturn();
 
         $this->payload['method'] = $return['method'];
-
-        $this->payload = array_filter($this->payload);
+        foreach ($return['params'] ?? [] as $k =>$v){
+            $this->payload[$k] = $v;
+        }
+        $this->payload['sign'] = $this->getSign(array_filter($this->payload));
 
         return $this->request($this->payload, $return['request']?:self::EXECUTE_REQUEST);
     }
@@ -79,8 +74,6 @@ class AlipayManage extends Manage
      */
     protected function request($payload, $type = self::EXECUTE_REQUEST)
     {
-        $payload['sign'] = $this->getSign($payload);
-
         if (!in_array($type, [self::EXECUTE_REQUEST, self::PAGE_REQUEST, self::SDK_REQUEST])){
             throw new AliChatException('request tpye error');
         }
@@ -127,6 +120,49 @@ class AlipayManage extends Manage
     protected function getSign($payload)
     {
         return $this->container['alipay.request']->generateSign($payload);
+    }
+
+    /**
+     * 处理参数
+     */
+    protected function parseParams()
+    {
+        $ignoreParams = [
+            'ali_public_key',
+            'private_key',
+            'http',
+            'log',
+            'mode'
+        ];
+
+        $convertParams = [
+            'app_id',
+            'method',
+            'format',
+            'charset',
+            'sign_type',
+            'version',
+            'return_url',
+            'notify_url',
+            'timestamp',
+            'sign',
+            'biz_content',
+            'app_auth_token',
+        ];
+
+        $params = $this->container['config']->all();
+
+        foreach ($params as $k =>$v){
+            if (in_array($k, $ignoreParams)) {
+                unset($params[$k]);
+            };
+            if (in_array($k, $convertParams)){
+                $this->payload[$k] = $v;
+                unset($params[$k]);
+            }
+        }
+
+        $this->payload['biz_content'] = json_encode($params);
     }
 
 }

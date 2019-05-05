@@ -54,7 +54,7 @@ class AlipayRequest
      */
     public function __construct(Config $config)
     {
-        $this->baseUri = self::URL[$config->get('alipay.mode', self::MODE_NORMAL)];
+        $this->baseUri = self::URL[$config->get('mode', self::MODE_NORMAL)];
         $this->config = $config;
 
         $this->setHttpOptions();
@@ -114,7 +114,7 @@ class AlipayRequest
      */
     public function sdkRequest($data)
     {
-        return htmlspecialchars(Arr::query($data));
+        return Arr::query($data);
     }
 
 
@@ -129,7 +129,7 @@ class AlipayRequest
      */
     public function generateSign(array $params)
     {
-        $privateKey = $this->config->get('alipay.private_key');
+        $privateKey = $this->config->get('private_key');
 
         if (is_null($privateKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [private_key]');
@@ -165,7 +165,7 @@ class AlipayRequest
      */
     public function verifySign(array $data, $sync = false, $sign = null)
     {
-        $publicKey = $this->config->get('alipay.ali_public_key');
+        $publicKey = $this->config->get('ali_public_key');
 
         if (is_null($publicKey)) {
             throw new InvalidConfigException('Missing Alipay Config -- [ali_public_key]');
@@ -207,6 +207,7 @@ class AlipayRequest
                 $stringToBeSigned .= $k.'='.$v.'&';
             }
             if (!$verify && $v !== '' && !is_null($v) && $k != 'sign' && '@' != substr($v, 0, 1)) {
+
                 $stringToBeSigned .= $k.'='.$v.'&';
             }
         }

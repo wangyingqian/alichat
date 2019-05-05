@@ -1,15 +1,19 @@
 <?php
 namespace Wangyingqian\AliChat\Kernel;
 
-use Wangyingqian\AliChat\AliChat;
 use Wangyingqian\AliChat\Support\Collection;
 
 class Config extends Collection
 {
+    protected static $config;
+
     public function __construct()
     {
-        $config = AliChat::getConfig();
+        parent::__construct(self::$config);
+    }
 
-        parent::__construct($config);
+    public static function setConfig($config)
+    {
+        self::$config = $config;
     }
 }

@@ -3,7 +3,6 @@ namespace Wangyingqian\AliChat\Kernel;
 
 use Wangyingqian\AliChat\Exception\AliChatException;
 use Wangyingqian\AliChat\Exception\InvalidSignException;
-use Wangyingqian\AliChat\Support\Collection;
 use Wangyingqian\AliChat\Support\Log;
 use Wangyingqian\AliChat\Support\Str;
 use Wangyingqian\AliChat\Support\Traits\HttpRequestTrait;
@@ -65,7 +64,7 @@ class WechatRequest
 
     public function __construct(Config $config)
     {
-        $this->baseUri = self::URL[$config->get('wechat.mode', self::MODE_NORMAL)];
+        $this->baseUri = self::URL[$config->get('mode', self::MODE_NORMAL)];
 
         $this->config = $config;
 
@@ -88,10 +87,10 @@ class WechatRequest
      */
     public function requestApi($endpoint, $payload, $cert = false)
     {
-        if ($this->config->get('wechat.mode', self::MODE_NORMAL) ===self::MODE_SERVICE) {
+        if ($this->config->get('mode', self::MODE_NORMAL) ===self::MODE_SERVICE) {
             $payload = array_merge($payload, [
-                'sub_mch_id' => $this->config->get('wechat.sub_mch_id'),
-                'sub_appid'  => $this->config->get('wechat.sub_app_id', ''),
+                'sub_mch_id' => $this->config->get('sub_mch_id'),
+                'sub_appid'  => $this->config->get('sub_app_id', ''),
             ]);
         }
 
@@ -99,8 +98,8 @@ class WechatRequest
             $endpoint,
             self::toXml($payload),
             $cert ? [
-                'cert'    => $this->config->get('wechat.cert_client'),
-                'ssl_key' => $this->config->get('wechat.cert_key'),
+                'cert'    => $this->config->get('cert_client'),
+                'ssl_key' => $this->config->get('cert_key'),
             ] : []
         );
         $result = is_array($result) ? $result : $this->fromXml($result);
@@ -117,7 +116,7 @@ class WechatRequest
      */
     public function generateSign($data)
     {
-        $key = $this->config->get('wechat.key');
+        $key = $this->config->get('key');
 
         if (is_null($key)) {
             throw new \InvalidArgumentException('Missing Wechat Config -- [key]');
@@ -164,7 +163,7 @@ class WechatRequest
         return openssl_decrypt(
             base64_decode($contents),
             'AES-256-ECB',
-            md5($this->getConfig('wechat.key'),
+            md5($this->getConfig('key'),
             OPENSSL_RAW_DATA
         ));
     }
@@ -297,9 +296,9 @@ class WechatRequest
      */
     private function setDevKey()
     {
-        if ($this->config->get('wechat.mode')== self::MODE_DEV) {
+        if ($this->config->get('mode')== self::MODE_DEV) {
             $data = [
-                'mch_id'    => $this->config->get('wechat.mch_id'),
+                'mch_id'    => $this->config->get('mch_id'),
                 'nonce_str' => Str::random(),
             ];
 
@@ -307,7 +306,7 @@ class WechatRequest
 
             $result = $this->requestApi('pay/getsignkey', $data);
 
-            $this->config->set('wechat.key', $result['sandbox_signkey']);
+            $this->config->set('key', $result['sandbox_signkey']);
         }
     }
 

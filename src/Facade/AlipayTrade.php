@@ -24,7 +24,7 @@ use Wangyingqian\AliChat\Support\Facade;
  * @method static Sync sync(array $order) 线下订单同步
  * @method static Settle settle(array $order) 线下结算
  * @method static Scan scan(array $order) 扫码支付
- * @method static RefundQuery refundQuery(array $order) 退款查询
+ * @method static RefundQuery refund_query(array $order) 退款查询
  * @method static Refund refund(array $order) 退款
  * @method static Query query(array $order) 查询
  * @method static Pos pos(array $order) 付款码
