@@ -56,4 +56,6 @@ class PayController
 
 $alipay = new PayController();
 
+
+
 $alipay->common();
