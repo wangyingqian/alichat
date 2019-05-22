@@ -7,15 +7,29 @@ use Wangyingqian\AliChat\Support\Str;
 
 class WechatManage extends Manage
 {
+    /**
+     * 支付请求
+     */
+    const PAY_REQUEST = 'pay';
 
-    public function init()
-    {
-        $this->payload = [
-            'appid'            => '',
-            'mch_id'           => '',
-            'nonce_str'        =>Str::random()
-        ];
-    }
+    /**
+     * 公众号请求
+     */
+    const ACCOUNT_REQUEST = 'account';
+
+    /**
+     * 第三方平台请求
+     */
+    const OPEN_REQUEST = 'open';
+
+//    public function init()
+//    {
+//        $this->payload = [
+//            'appid'            => '',
+//            'mch_id'           => '',
+//            'nonce_str'        =>Str::random()
+//        ];
+//    }
 
     public function run($gateway, $method)
     {
@@ -37,11 +51,27 @@ class WechatManage extends Manage
 
         $this->payload = array_filter($this->payload);
 
-        $this->payload['sign'] = $this->container['wechat.request']->generateSign($this->payload);
-
-        return $this->container['wechat.request']->requestApi($return['method'], $this->payload);
+        return $this->request($return['method'],$return['request'] ?: self::PAY_REQUEST);
     }
 
+    protected function request($endpoint, $type)
+    {
+        if (!in_array($type, [self::PAY_REQUEST, self::ACCOUNT_REQUEST, self::OPEN_REQUEST])){
+            throw new AliChatException('request tpye error');
+        }
+
+        switch ($type){
+            case self::PAY_REQUEST:
+                $this->payload['sign'] = $this->container['wechat.request']->generateSign($this->payload);
+                return $this->container['wechat.request']->payRequest($endpoint, $this->payload);
+            case self::ACCOUNT_REQUEST:
+                return $this->container['wechat.request']->accountRequest($endpoint, $this->payload);
+            case self::OPEN_REQUEST:
+                return $this->container['wechat.request']->openRequest($endpoint, $this->payload);
+        }
+
+        return true;
+    }
 
     /**
      * 过滤参数
@@ -67,4 +97,13 @@ class WechatManage extends Manage
         }
     }
 
+    public function fromXml($xml)
+    {
+        return $this->container['wechat.request']->fromXml($xml);
+    }
+
+    public function toXml($array)
+    {
+        return $this->container['wechat.request']->toXml($array);
+    }
 }

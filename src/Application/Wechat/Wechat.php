@@ -13,9 +13,13 @@ class Wechat
 
     protected $tradeType;
 
+    protected $request;
+
     public function __invoke(AliChatContainer $container)
     {
         $this->container = $container;
+
+        $this->container['wechat.request']->setConfig('wechat', $this);
 
         return $this;
     }
@@ -25,7 +29,8 @@ class Wechat
         return [
             'method'  => $this->method,
             'trade_type' => $this->tradeType,
-            'params'  => $this->params
+            'params'  => $this->params,
+            'request' => $this->request
         ];
     }
 }

@@ -4,6 +4,8 @@ namespace Wangyingqian\AliChat\Support\Traits;
 
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Trait HttpRequest.
@@ -150,5 +152,22 @@ trait HttpRequestTrait
         }
 
         return $contents;
+    }
+
+    /**
+     * return json
+     *
+     * @param $data
+     *
+     * @return string
+     */
+    public function json($data = null)
+    {
+        return JsonResponse::create($data)->getContent();
+    }
+
+    public function redirect($url)
+    {
+        RedirectResponse::create($url);
     }
 }

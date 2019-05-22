@@ -37,6 +37,11 @@ class WechatRequest
     const MODE_SERVICE = 'service';
 
     /**
+     * 公众号
+     */
+    const MODE_ACCOUNT = 'account';
+
+    /**
      * Const url.
      */
     const URL = [
@@ -45,7 +50,11 @@ class WechatRequest
         self::MODE_HK      => 'https://apihk.mch.weixin.qq.com/',
         self::MODE_SERVICE => 'https://api.mch.weixin.qq.com/',
         self::MODE_US      => 'https://apius.mch.weixin.qq.com/',
+        self::MODE_ACCOUNT => 'https://api.weixin.qq.com/',
     ];
+
+
+    protected $mode;
 
     /**
      * Wechat gateway.
@@ -64,7 +73,7 @@ class WechatRequest
 
     public function __construct(Config $config)
     {
-        $this->baseUri = self::URL[$config->get('mode', self::MODE_NORMAL)];
+        $this->baseUri = self::URL[$this->mode = $config->get('mode', self::MODE_NORMAL)];
 
         $this->config = $config;
 
@@ -74,7 +83,7 @@ class WechatRequest
     }
 
     /**
-     * request
+     * pay request
      *
      * @param $endpoint
      * @param $payload
@@ -85,12 +94,12 @@ class WechatRequest
      * @throws AliChatException
      * @throws InvalidSignException
      */
-    public function requestApi($endpoint, $payload, $cert = false)
+    public function payRequest($endpoint, $payload, $cert = false)
     {
-        if ($this->config->get('mode', self::MODE_NORMAL) ===self::MODE_SERVICE) {
+        if ($this->mode ===self::MODE_SERVICE) {
             $payload = array_merge($payload, [
                 'sub_mch_id' => $this->config->get('sub_mch_id'),
-                'sub_appid'  => $this->config->get('sub_app_id', ''),
+                'sub_appid'  => $this->config->get('sub_appid', ''),
             ]);
         }
 
@@ -105,6 +114,27 @@ class WechatRequest
         $result = is_array($result) ? $result : $this->fromXml($result);
 
         return $this->processingApiResult($endpoint, $result);
+    }
+
+    /**
+     * account request
+     *
+     * @param $endpoint
+     * @param $payload
+     *
+     * @return array|string
+     */
+    public function accountRequest($endpoint, $payload)
+    {
+//        $accessToken = $this->config->get('access_token');
+//        if (!empty($accessToken)){
+//            $endpoint = $endpoint .'?access_token='. $accessToken;
+//            unset($payload['access_token']);
+//        }
+
+        $result = $this->post($endpoint, $payload);
+
+        return $result;
     }
 
     /**
@@ -222,29 +252,10 @@ class WechatRequest
         return $default;
     }
 
-    /**
-     * get type name
-     *
-     * @param string $type
-     *
-     * @return string
-     */
-    public function getTypeName($type = '')
+    public function setConfig($key, $value)
     {
-        switch ($type) {
-            case '':
-                $type = 'app_id';
-                break;
-            case 'app':
-                $type = 'appid';
-                break;
-            default:
-                $type = $type.'_id';
-        }
-
-        return $type;
+        $this->config->set($key, $value);
     }
-
 
     public function getBaseUri()
     {
@@ -257,7 +268,6 @@ class WechatRequest
      * @param $endpoint
      * @param array $result
      *
-     * @return array
      *
      * @throws AliChatException
      * @throws InvalidSignException
@@ -281,7 +291,10 @@ class WechatRequest
         if ($endpoint === 'pay/getsignkey' ||
             strpos($endpoint, 'mmpaymkttransfers') !== false ||
             self::generateSign($result) === $result['sign']) {
-            return $result;
+
+            return (method_exists($wechat = $this->config->get('wechat'), 'handle'))
+                ? $wechat->handle($result)
+                : $result;
         }
 
         throw new InvalidSignException('Wechat Sign Verify FAILED', $result);
@@ -296,7 +309,7 @@ class WechatRequest
      */
     private function setDevKey()
     {
-        if ($this->config->get('mode')== self::MODE_DEV) {
+        if ($this->mode  == self::MODE_DEV) {
             $data = [
                 'mch_id'    => $this->config->get('mch_id'),
                 'nonce_str' => Str::random(),

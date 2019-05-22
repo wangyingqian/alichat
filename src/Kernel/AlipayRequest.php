@@ -278,19 +278,19 @@ class AlipayRequest
         $method = str_replace('.', '_', $data['method']).'_response';
         $result = json_decode(reset($result), true);
 
-        if (!isset($result['sign']) || $result[$method]['code'] != '10000') {
+        if (!isset($result[$method])){
             throw new RequestException(
-                'Get Alipay API Error:'.$result[$method]['msg'].
-                (isset($result[$method]['sub_code']) ? (' - '.$result[$method]['sub_code']) : '').
-                (isset($result[$method]['sub_msg']) ? (' - '.$result[$method]['sub_msg']) : ''),
-                $result
-            );
+                (isset($result['error_response']['code']) ? (' - code: '.$result['error_response']['code']) : '').
+                        (isset($result['error_response']['msg']) ? (' - msg: '.$result['error_response']['msg']) : '').
+                        (isset($result['error_response']['sub_code']) ? (' - sub_code: '.$result['error_response']['sub_code']) : '').
+                        (isset($result['error_response']['sub_msg']) ? (' - sub_msg: '.$result['error_response']['sub_msg']) : ''));
         }
 
-        if (self::verifySign($result[$method], true, $result['sign'])) {
-            return $result[$method];
+        if (isset($result['sign'])){
+            if (self::verifySign($result[$method], true, $result['sign'])) {
+                return $result[$method];
+            }
         }
-
 
         throw new InvalidSignException('Alipay Sign Verify FAILED', $result);
     }

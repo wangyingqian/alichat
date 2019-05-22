@@ -42,6 +42,7 @@ class AlipayManage extends Manage
      */
     public function run($name, $method)
     {
+
         $object = $this->getGateWay($method, $name);
 
         if (!is_subclass_of($object, Alipay::class)){
@@ -52,7 +53,7 @@ class AlipayManage extends Manage
 
         $this->payload['method'] = $return['method'];
 
-        $this->parseParams($return['params']);
+        $this->parseParams($return['params'] ?? [], $return['format']);
 
         $this->payload['sign'] = $this->getSign(array_filter($this->payload));
 
@@ -124,8 +125,9 @@ class AlipayManage extends Manage
      * 处理参数
      *
      * @param $params
+     * @param $format
      */
-    protected function parseParams($params)
+    protected function parseParams($params, $format)
     {
         $ignoreParams = [
             'ali_public_key',
@@ -162,7 +164,12 @@ class AlipayManage extends Manage
             }
         }
 
-        $this->payload['biz_content'] = json_encode($params);
+        if ($format){
+            $this->payload['biz_content'] = json_encode($params);
+        }else{
+            $this->payload = array_merge($this->payload, $params);
+        }
+
     }
 
 }

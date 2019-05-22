@@ -9,7 +9,7 @@ class Config extends Collection
 
     public function __construct()
     {
-        parent::__construct(self::$config);
+        parent::__construct(self::$config ?: []);
     }
 
     public static function setConfig($config)

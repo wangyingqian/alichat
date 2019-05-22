@@ -53,6 +53,11 @@ class Manage implements AliChatInterface
      */
     public function getGateWay($method, $gateway)
     {
+        if (stripos($method, '_') === 0){
+            list($dir, $method) = explode('_', substr($method, 1), 2);
+            $gateway = $gateway .'\\'. Str::ucfirst($dir);
+        }
+
         $class = substr(get_class($this),0, -6).'\\'.Str::ucfirst($gateway). '\\'.Str::ucfirst(Str::studly($method));
 
         if (!class_exists($class)){

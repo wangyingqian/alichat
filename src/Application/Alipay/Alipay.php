@@ -7,11 +7,34 @@ class Alipay
 {
     protected $container;
 
+    /**
+     * 请求方式
+     *
+     * @var
+     */
     protected $request;
+
+    /**
+     * 请求方法
+     *
+     * @var
+     */
 
     protected $method;
 
+    /**
+     * 请求参数
+     *
+     * @var
+     */
     protected $params;
+
+    /**
+     * 请求参数格式
+     *
+     * @var bool
+     */
+    protected $format = true;
 
     public function __invoke(AliChatContainer $container)
     {
@@ -25,7 +48,8 @@ class Alipay
         return [
             'request' => $this->request,
             'method'  => $this->method,
-            'params'  => $this->params
+            'params'  => $this->params,
+            'format'  => $this->format
         ];
     }
 }
