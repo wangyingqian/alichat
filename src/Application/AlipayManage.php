@@ -109,6 +109,29 @@ class AlipayManage extends Manage
         throw new InvalidSignException('Alipay Sign Verify FAILED', $data);
     }
 
+    public function decrypt($encryptedData, $aesKey)
+    {
+        $arrayEncryptedData = json_decode($encryptedData, true);
+
+        if (!isset($arrayEncryptedData['response'])){
+            return $encryptedData;
+        }
+
+        $respond = $arrayEncryptedData['response'];
+
+        $aesKey=base64_decode($aesKey);
+
+        $iv = 0;
+
+        $aesIV=base64_decode($iv);
+
+        $aesCipher=base64_decode($respond);
+
+        $arrayEncryptedData['response'] =json_decode( openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, OPENSSL_RAW_DATA, $aesIV), true);
+
+        return $arrayEncryptedData;
+    }
+
     /**
      * sign
      *

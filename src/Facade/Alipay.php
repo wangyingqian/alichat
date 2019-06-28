@@ -7,7 +7,7 @@ use Wangyingqian\AliChat\Support\Facade;
  * Class Alipay
  *
  * @method static verify();
- *
+ * @method static decrypt($encryptedData, $aseKey)
  * @package Wangyingqian\AliChat\Facade
  */
 class Alipay extends Facade

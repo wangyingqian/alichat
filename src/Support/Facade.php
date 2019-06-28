@@ -26,7 +26,7 @@ class Facade
     {
         new self(...$arg);
 
-        return self::getInstance($method, ...$arg);
+        return self::getInstance($method, $arg);
     }
 
     protected static function getInstance($classname, $arg)
@@ -37,7 +37,7 @@ class Facade
             list($class, $method) = explode('.',$facade, 2);
             return self::$container[$class]->$method($classname);
         }else{
-            return self::$container[$facade]->$classname($arg);
+            return self::$container[$facade]->$classname(...$arg);
         }
     }
 
